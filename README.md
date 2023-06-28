@@ -13,7 +13,9 @@ npm start
 Open [http://localhost:3000/](http://localhost:3000/) to see your Dapp. You will [Metamask](https://metamask.io) installed
 
 ## User Guide
-![image](https://github.com/vuphan365/demo-swap/assets/29919845/ed18c945-212c-4df4-b71e-86d6ee44d07e)
+![image](https://github.com/vuphan365/demo-swap/assets/29919845/8c8b9ed2-0f7d-4fd8-ac78-5707d93da642)
+
+
 - Step 1: Connect your wallet
 - Step 2: Select the in-token, you can paste the token address to find it
 - Step 3: Input amount of swap token
