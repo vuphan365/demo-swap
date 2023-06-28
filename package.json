@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "A boilerplate repository to get you started with Hardhat and Ethereum development",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "predeploy": "cd frontend && npm run build",
+    "deploy": "cd frontend && gh-pages -d build"
   },
   "repository": {
     "type": "git",
@@ -14,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/NomicFoundation/hardhat-boilerplate/issues"
   },
-  "homepage": "https://github.com/NomicFoundation/hardhat-boilerplate#readme",
+  "homepage": "http://vuphan365.github.io/demo-swap",
   "devDependencies": {
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
@@ -25,8 +27,12 @@
     "@nomiclabs/hardhat-etherscan": "^3.1.4",
     "chai": "^4.3.7",
     "ethers": "^5.7.2",
+    "gh-pages": "^5.0.0",
     "hardhat": "^2.12.5",
     "hardhat-gas-reporter": "^1.0.9",
     "solidity-coverage": "^0.8.2"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.1.1"
   }
 }
