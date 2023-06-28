@@ -5,7 +5,7 @@
   "scripts": {
     "test": "hardhat test",
     "predeploy": "cd frontend && npm run build",
-    "deploy": "cd frontend && gh-pages -d build"
+    "deploy": "gh-pages -d frontend/build"
   },
   "repository": {
     "type": "git",
