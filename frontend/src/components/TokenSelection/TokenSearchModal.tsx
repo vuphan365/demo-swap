@@ -36,15 +36,22 @@ const TokenSearchModal: FC<TokenSearchModalParams> = ({ isOpen, onClose, default
     if (value.length === TOKEN_ADDRESS_LENGTH) {
       onSelectToken(value)
     }
-
   }
-  const _tokenList = useMemo(() =>
-    tokenList.filter((_token) =>
-      _token?.name?.toLowerCase().indexOf(currentToken?.toLowerCase()) > -1 ||
-      _token?.address?.toLowerCase().indexOf(currentToken?.toLowerCase()) > -1
-    ),
-    [tokenList, currentToken]
-  )
+  const _tokenList = useMemo(() => {
+    const _filterList = []
+    const _remainList = []
+    tokenList.forEach((_token) => {
+      if (
+        _token?.name?.toLowerCase().indexOf(currentToken?.toLowerCase()) > -1 ||
+        _token?.address?.toLowerCase().indexOf(currentToken?.toLowerCase()) > -1
+      ) {
+        _filterList.push(_token)
+      } else {
+        _remainList.push(_token)
+      }
+    })
+    return [..._filterList, ..._remainList]
+  }, [tokenList, currentToken])
 
   if (!isOpen) return null
 

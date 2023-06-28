@@ -1,7 +1,3 @@
-import { Token } from '@uniswap/sdk-core'
-import {
-  ChainId,
-} from '@uniswap/smart-order-router'
 export const GOERLI_NETWORK_ID = "0x5";
 
 export const TOKEN = {
@@ -25,21 +21,9 @@ export const DEFAULT_TOKEN_SELECTION = [
 export const TOKEN_ADDRESS_LENGTH = 42
 
 export const DEFAULT_SWAP_FORM = {
-  outputToken: new Token(
-    ChainId.GÖRLI,
-    '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
-    18,
-    'WETH',
-    "Wrapped Ether"
-  ),
-  inputAmount: 0.1,
-  inputToken: new Token(
-    ChainId.GÖRLI,
-    '0x326C977E6efc84E512bB9C30f76E30c160eD06FB',
-    18,
-    'LINK',
-    "ChainLink Token"
-  ),
+  outputToken: null,
+  inputAmount: null,
+  inputToken: null,
   outputAmount: null
 }
 
@@ -59,6 +43,7 @@ export const ERC20_ABI = [
   'function balanceOf(address owner) view returns (uint256)',
   'function decimals() view returns (uint8)',
   'function symbol() view returns (string)',
+  'function name() view returns (string)',
 
   // Authenticated Functions
   'function transfer(address to, uint amount) returns (bool)',

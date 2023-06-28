@@ -34,6 +34,9 @@ type GeneralSwapParams = {
   tokenOut: Token
 }
 
+type ExecuteSwapParams = GeneralSwapParams & {
+  onSwapSuccess?: (tokenIn: Token, tokenOut: Token) => void
+}
 export enum SwapStatus {
   QUOTING = "QUOTING",
   QUOTED = "QUOTED",
@@ -58,8 +61,9 @@ const swapAtom = atom<SwapAtom>({
 export const useSwap = () => {
   const [swapState, setSwapState] = useAtom(swapAtom)
   const { web3, sendTransaction, getWeb3Provider } = useWeb3()
-  const { wallet, getWalletAddress } = useWallet()
+  const { getWalletAddress } = useWallet()
   const toast = useToast()
+
   // const { getPoolInfo } = usePool()
 
   // async function getOutputQuote(route: Route<Currency, Currency>, params: GeneralSwapParams) {
@@ -108,45 +112,60 @@ export const useSwap = () => {
     }
   }, [getWeb3Provider, sendTransaction])
 
-  const createTrade = useCallback(debounce(async (params: GeneralSwapParams) => {
-    const { inAmount, tokenIn, tokenOut } = params
-    setSwapState((prev) => ({
-      ...prev,
-      status: SwapStatus.QUOTING
-    }))
+  const createSwap = useCallback(debounce(async (params: GeneralSwapParams) => {
+    try {
+      const address = await getWalletAddress()
+      const provider = getWeb3Provider();
+      if (!address || !provider) return
+      const { inAmount, tokenIn, tokenOut } = params
+      if (tokenIn.balance.lt(inAmount)) {
+        setSwapState((prev) => ({
+          ...prev,
+          route: null,
+          status: SwapStatus.QUOTED
+        }))
+        return
+      }
+      setSwapState((prev) => ({
+        ...prev,
+        route: null,
+        status: SwapStatus.QUOTING
+      }))
 
-    const router = new AlphaRouter({
-      chainId: ChainId.GÖRLI,
-      provider: getWeb3Provider()
-    })
-    const address = await getWalletAddress()
-    const options: SwapOptionsSwapRouter02 = {
-      recipient: address,
-      slippageTolerance: new Percent(50, 10_000),
-      deadline: Math.floor(Date.now() / 1000 + 1800),
-      type: SwapType.SWAP_ROUTER_02,
+      const router = new AlphaRouter({
+        chainId: ChainId.GÖRLI,
+        provider: getWeb3Provider()
+      })
+      const options: SwapOptionsSwapRouter02 = {
+        recipient: address,
+        slippageTolerance: new Percent(50, 10_000),
+        deadline: Math.floor(Date.now() / 1000 + 1800),
+        type: SwapType.SWAP_ROUTER_02,
+      }
+      const route = await router.route(
+        CurrencyAmount.fromRawAmount(
+          //@ts-ignore
+          tokenIn,
+          //@ts-ignore
+          inAmount.toString()
+        ),
+        //@ts-ignore
+        tokenOut,
+        TradeType.EXACT_INPUT,
+        options
+      )
+      setSwapState(prev => ({
+        ...prev,
+        route,
+        quote: ethers.BigNumber.from(convertGWeiToWei(route?.quote?.toFixed())),
+        status: SwapStatus.QUOTED
+      }))
+    } catch (error) {
+      console.log('error', error)
     }
-    const route = await router.route(
-      CurrencyAmount.fromRawAmount(
-        //@ts-ignore
-        tokenIn,
-        //@ts-ignore
-        inAmount
-      ),
-      //@ts-ignore
-      tokenOut,
-      TradeType.EXACT_INPUT,
-      options
-    )
-    setSwapState(prev => ({
-      ...prev,
-      route,
-      quote: ethers.BigNumber.from(convertGWeiToWei(route.quote.toFixed())),
-      status: SwapStatus.QUOTED
-    }))
   }, 500), [getWeb3Provider, getWalletAddress])
 
-  const executeSwap = useCallback(async ({ tokenIn }: GeneralSwapParams) => {
+  const executeSwap = useCallback(async ({ tokenIn, tokenOut, onSwapSuccess }: ExecuteSwapParams) => {
     const toastId = toast({
       position: 'top-right',
       status: "info",
@@ -175,10 +194,10 @@ export const useSwap = () => {
         status: "success",
         title: "Swap successfully",
       })
+      onSwapSuccess(tokenIn, tokenOut)
       // update state
       return res
     } catch (error) {
-      console.log('error', error)
       toast.close(toastId)
       toast({
         position: 'top-right',
@@ -190,7 +209,7 @@ export const useSwap = () => {
   }, [swapState?.route, getWalletAddress, getWeb3Provider, sendTransaction])
 
   return {
-    createTrade,
+    createSwap,
     executeSwap,
     quote: swapState?.quote,
     status: swapState?.status

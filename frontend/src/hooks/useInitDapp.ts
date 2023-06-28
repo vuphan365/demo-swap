@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useWallet } from './useWallet'
-import { useToken } from './useToken'
+// import { useToken } from './useToken'
 import { useWeb3 } from './useWeb3'
 
 export function useInitDapp() {

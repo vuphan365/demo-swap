@@ -2,6 +2,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { ethers } from "ethers";
 import { atom, useAtom } from 'jotai'
 import type { Token } from 'types/token'
+import { Token as SDKToken } from '@uniswap/sdk-core'
+import {
+  ChainId,
+} from '@uniswap/smart-order-router'
 import { useWeb3 } from './useWeb3'
 import { useWallet } from './useWallet'
 import { DEFAULT_TOKEN_SELECTION, ERC20_ABI } from 'constant'
@@ -29,15 +33,19 @@ export function useTokenSelection() {
       const name = await tokenContract?.name()
       const balance = await tokenContract?.balanceOf(address)
       const symbol = await tokenContract?.symbol()
-      return {
-        address: tokenAddress,
-        balance,
-        name,
-        contract: tokenContract,
-        symbol
-      } as Token
+      const sdkToken = new SDKToken(
+        ChainId.GÖRLI,
+        tokenAddress,
+        18,
+        symbol,
+        name
+      ) as Token;
+      sdkToken.balance = balance
+      sdkToken.contract = tokenContract
+      return sdkToken
     }
-    catch {
+    catch (e) {
+      console.log('e', e)
       return null
     }
   }
@@ -53,18 +61,6 @@ export function useTokenSelection() {
       setIsLoading(false)
     }
   }
-
-  const onCheckBalance = useCallback(async (address: string) => {
-    // if (!token?.contract) return
-    // console.log('token?.contract', token?.contract?.name())
-
-    // const balance = await token?.contract?.balanceOf(address)
-    // console.log('token?.contract?.balanceOf', balance.toString())
-    // setToken(prev => ({
-    //   ...prev,
-    //   balance
-    // }))
-  }, [])
 
   const onSelectToken = async (tokenAddress) => {
     if (tokenSelection?.tokenList?.find((_token) => _token?.address === tokenAddress)) return
@@ -90,11 +86,6 @@ export function useTokenSelection() {
   return {
     tokenList: tokenSelection?.tokenList,
     onSelectToken,
-    isLoading
-    // initTokenSelection
-    // initContractToken,
-    // token,
-    // onStartCheckBalance,
-    // onStopCheckBalance
+    isLoading,
   }
 }

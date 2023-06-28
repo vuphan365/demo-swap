@@ -36,7 +36,7 @@ const TokenSelection: FC<TokenSelectionParams> = ({ value, onChange, disabledTok
         {buttonContent}
       </Button>
       <Text fontSize="xs">Balance: {value?.balance ? convertWeiToGwei(value?.balance?.toString(), 4) : 0}</Text>
-      <TokenSearchModal isOpen={searchVisible} defaultToken={value?.name} onClose={onSetToken} disabledTokenAddress={disabledToken?.address} />
+      <TokenSearchModal isOpen={searchVisible} defaultToken={value?.symbol} onClose={onSetToken} disabledTokenAddress={disabledToken?.address} />
     </Flex>
   )
 }

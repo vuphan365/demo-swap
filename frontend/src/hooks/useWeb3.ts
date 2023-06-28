@@ -26,10 +26,8 @@ export function useWeb3() {
     // if (transaction.value) {
     //   transaction.value = BigNumber.from(transaction.value)
     // }
-    console.log('transaction', transaction)
     const txRes = await getWeb3Provider().getSigner(0).sendTransaction(transaction)
     let receipt = null
-    console.log(' txRes', txRes)
     while (receipt === null) {
       try {
         receipt = await getWeb3Provider().getTransactionReceipt(txRes.hash)
