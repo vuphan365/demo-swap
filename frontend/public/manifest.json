@@ -1,6 +1,6 @@
 {
-  "short_name": "Hardhat React Dapp",
-  "name": "Hardhat Create React Dapp Sample",
+  "short_name": "Demo Swap",
+  "name": "Demo Swap",
   "icons": [
     {
       "src": "favicon.ico",

@@ -7,6 +7,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
+console.log('router', router)
 root.render(
   <ChakraProvider>
     <RouterProvider router={router} />
