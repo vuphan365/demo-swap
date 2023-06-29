@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/demo-swap/static/js/main.1dc582bb.js",
+    "main.js": "/demo-swap/static/js/main.f191503d.js",
     "index.html": "/demo-swap/index.html",
-    "main.1dc582bb.js.map": "/demo-swap/static/js/main.1dc582bb.js.map"
+    "main.f191503d.js.map": "/demo-swap/static/js/main.f191503d.js.map"
   },
   "entrypoints": [
-    "static/js/main.1dc582bb.js"
+    "static/js/main.f191503d.js"
   ]
 }
