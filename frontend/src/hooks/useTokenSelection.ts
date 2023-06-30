@@ -77,7 +77,7 @@ export function useTokenSelection() {
   }
 
   useEffect(() => {
-    if (getWeb3Provider()._isProvider && wallet?.address) {
+    if (getWeb3Provider()?._isProvider && wallet?.address) {
       initTokenSelection(getWeb3Provider().getSigner(0), wallet?.address)
     }
   }, [getWeb3Provider, wallet?.address])

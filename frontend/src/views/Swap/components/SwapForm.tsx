@@ -31,7 +31,7 @@ enum SwapFormField {
 
 const validationSchema = yup.object({
   [SwapFormField.inputAmount]: yup.number().when(SwapFormField.inputToken, ([inputToken], schema) => {
-    console.log('token', inputToken)
+    if (!inputToken) return schema.required("You must input balance")
     //@ts-ignore
     return schema.max(Number(convertWeiToGwei(inputToken?.balance?.toString(), 4)), "You can only swap less than you balance").min(0, "Swap value must greater than 0")
   }),

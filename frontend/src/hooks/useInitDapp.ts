@@ -4,9 +4,9 @@ import { useWallet } from './useWallet'
 import { useWeb3 } from './useWeb3'
 
 export function useInitDapp() {
-  const { connectWallet, wallet } = useWallet()
+  const { connectWallet } = useWallet()
   // const { token, initContractToken, onStartCheckBalance, onStopCheckBalance } = useToken()
-  const { initWeb3Provider, web3 } = useWeb3()
+  const { initWeb3Provider } = useWeb3()
 
   const onAccountChange = async () => {
     await connectWallet()
@@ -15,17 +15,17 @@ export function useInitDapp() {
   const onInitApp = async () => {
     await onAccountChange()
     initWeb3Provider()
-    window.ethereum.on('accountsChanged', async () => {
+    window?.ethereum?.on?.('accountsChanged', async () => {
       connectWallet()
     });
   }
 
   useEffect(() => {
     onInitApp()
-    window.ethereum.on('accountsChanged', onAccountChange);
-    window.ethereum.on('chainChanged', () => window.location.reload());
+    window?.ethereum?.on?.('accountsChanged', onAccountChange);
+    window?.ethereum?.on?.('chainChanged', () => window.location.reload());
     return () => {
-      window.ethereum.removeListener('accountsChanged', onAccountChange);
+      window?.ethereum?.removeListener?.('accountsChanged', onAccountChange);
     }
   }, [])
 

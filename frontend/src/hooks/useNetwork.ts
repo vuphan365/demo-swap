@@ -11,7 +11,7 @@ export function useNetwork() {
   const [network, setNetwork] = useAtom(networkAtom)
 
   const connectNetwork = async () => {
-    await window.ethereum.request({
+    await window?.ethereum?.request({
 
       method: "wallet_switchEthereumChain",
       params: [{ chainId: network.chainId }],
@@ -19,7 +19,7 @@ export function useNetwork() {
   }
 
   const checkNetwork = async () => {
-    if (window.ethereum.networkVersion !== network.chainId) {
+    if (window?.ethereum?.networkVersion !== network.chainId) {
       await connectNetwork();
     }
   }

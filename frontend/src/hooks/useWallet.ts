@@ -13,7 +13,8 @@ export function useWallet() {
   const connectWallet = async () => {
     // get first account
     await checkNetwork()
-    const values = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const values = await window?.ethereum?.request({ method: 'eth_requestAccounts' });
+    if (!values) return ""
     if (Array.isArray(values) && values.length > 0) {
       setWallet({
         address: values[0]
@@ -24,7 +25,7 @@ export function useWallet() {
 
   const disconnectWallet = async () => {
     // get first account
-    const values = await window.ethereum.request({ method: 'eth_requestAccounts', params: [{ eth_accounts: {} }] });
+    const values = await window?.ethereum?.request({ method: 'eth_requestAccounts', params: [{ eth_accounts: {} }] });
     setWallet({ address: null })
   }
 

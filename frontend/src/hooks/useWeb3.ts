@@ -1,4 +1,5 @@
 import { ethers, BigNumber } from "ethers";
+import { useToast } from '@chakra-ui/react'
 import { atom, useAtom } from 'jotai'
 import { useCallback } from "react";
 
@@ -7,10 +8,20 @@ const web3Atom = atom({
 })
 
 export function useWeb3() {
+  const toast = useToast()
   const [web3, setWeb3] = useAtom(web3Atom)
 
   const initWeb3Provider = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider)
+    if (!window?.ethereum) {
+      toast({
+        position: 'top-right',
+        status: "error",
+        title: "Please install wallet first",
+        duration: 5000,
+      })
+      return null
+    }
+    const provider = new ethers.providers.Web3Provider(window?.ethereum as ethers.providers.ExternalProvider)
     setWeb3({
       provider
     })
@@ -18,6 +29,9 @@ export function useWeb3() {
   }
 
   const getWeb3Provider = useCallback(() => {
+    if (!window?.ethereum) {
+      return null
+    }
     if (!web3?.provider) return initWeb3Provider()
     return web3.provider
   }, [web3?.provider])
