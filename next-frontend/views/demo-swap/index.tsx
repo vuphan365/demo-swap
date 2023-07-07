@@ -1,4 +1,3 @@
-"use client"
 import { Box, Flex } from '@chakra-ui/react'
 import SwapForm from './components/SwapForm'
 
