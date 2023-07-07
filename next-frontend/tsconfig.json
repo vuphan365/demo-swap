@@ -5,11 +5,10 @@
     "strictNullChecks": false,
     "target": "es5",
     "jsx": "preserve",
-    "baseUrl": ".",
     "paths": {
-      "@/components/*": [
-        "components/*"
-      ]
+      "@/*": [
+        "./*"
+      ],
     },
     "resolveJsonModule": true,
     "esModuleInterop": true,

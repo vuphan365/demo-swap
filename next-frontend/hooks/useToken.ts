@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Token } from 'types/token'
+import { Token } from '@/types/token'
 import { Token as SDKToken } from '@uniswap/sdk-core'
 import { useWallet } from './useWallet'
 import {

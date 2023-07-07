@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Box, Flex, Button, Heading } from '@chakra-ui/react'
 import { ExternalLinkIcon } from '@chakra-ui/icons'
-import { useWallet } from 'hooks/useWallet'
+import { useWallet } from '@/hooks/useWallet'
 
 const AccountSetting = () => {
   const { wallet, disconnectWallet } = useWallet()

@@ -1,9 +1,9 @@
 import { FC, useCallback, useMemo, useState } from 'react'
 import { Button, Flex, Text } from '@chakra-ui/react'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import type { Token } from 'types/token'
+import type { Token } from '@/types/token'
 import TokenSearchModal from './TokenSearchModal'
-import { convertWeiToGwei } from 'utils'
+import { convertWeiToGwei } from '@/utils'
 interface TokenSelectionParams {
   value: Token,
   disabledToken?: Token,

@@ -1,6 +1,6 @@
 import { Box, Flex, Button, Heading } from '@chakra-ui/react'
 import { LinkIcon } from '@chakra-ui/icons'
-import { useWallet } from 'hooks/useWallet'
+import { useWallet } from '@/hooks/useWallet'
 
 const ConnectWallet = () => {
   const { wallet, connectWallet } = useWallet()

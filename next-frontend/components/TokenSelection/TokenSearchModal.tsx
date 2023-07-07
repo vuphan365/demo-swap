@@ -14,10 +14,10 @@ import {
   Spinner
 } from '@chakra-ui/react'
 import { MoonIcon } from '@chakra-ui/icons'
-import { TOKEN_ADDRESS_LENGTH } from 'constant'
-import { convertWeiToGwei } from 'utils'
-import { Token } from 'types/token'
-import { useTokenSelection } from 'hooks/useTokenSelection'
+import { TOKEN_ADDRESS_LENGTH } from '@/constant'
+import { convertWeiToGwei } from '@/utils'
+import { Token } from '@/types/token'
+import { useTokenSelection } from '@/hooks/useTokenSelection'
 
 interface TokenSearchModalParams {
   isOpen: boolean,
