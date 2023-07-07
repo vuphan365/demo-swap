@@ -8,7 +8,7 @@ const AccountSetting = () => {
 
   const shortenAddress = useMemo(() => {
     if (!wallet?.address) return ''
-    return `${wallet.address.slice(0, 4)}...${wallet.address.slice(wallet.address.length - 4)}`
+    return `${wallet?.address?.slice(0, 4)}...${wallet.address.slice(wallet.address?.length - 4)}`
   }, [wallet?.address])
 
   return (
