@@ -12,6 +12,7 @@ export function useWeb3() {
   const [web3, setWeb3] = useAtom(web3Atom)
 
   const initWeb3Provider = async () => {
+    console.log('ethers', ethers)
     if (!window?.ethereum) {
       toast({
         position: 'top-right',
@@ -21,6 +22,7 @@ export function useWeb3() {
       })
       return null
     }
+
     const provider = new ethers.providers.Web3Provider(window?.ethereum as ethers.providers.ExternalProvider)
     setWeb3({
       provider
