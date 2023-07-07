@@ -1,4 +1,4 @@
-import { React } from 'react'
+import React from 'react'
 import { Providers } from './providers'
 import Header from 'components/Header/Header'
 export default function DashboardLayout({

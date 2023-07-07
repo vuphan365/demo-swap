@@ -6,11 +6,6 @@
     "target": "es5",
     "jsx": "preserve",
     "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "**/*",
-      ]
-    },
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "lib": [
@@ -30,10 +25,10 @@
       {
         "name": "next"
       }
-    ]
+    ],
   },
   "include": [
-    "./src/**/*",
+    "./**/*",
     ".next/types/**/*.ts"
   ],
   "exclude": [

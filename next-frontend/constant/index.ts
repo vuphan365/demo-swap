@@ -1,3 +1,5 @@
+import type { SwapFormParams } from 'types/token'
+
 export const GOERLI_NETWORK_ID = "0x5";
 
 export const TOKEN = {
@@ -20,7 +22,7 @@ export const DEFAULT_TOKEN_SELECTION = [
 
 export const TOKEN_ADDRESS_LENGTH = 42
 
-export const DEFAULT_SWAP_FORM = {
+export const DEFAULT_SWAP_FORM: SwapFormParams = {
   outputToken: null,
   inputAmount: null,
   inputToken: null,
