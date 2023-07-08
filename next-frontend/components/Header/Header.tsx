@@ -1,7 +1,7 @@
 "use client"
 import { Box, Flex, Button } from '@chakra-ui/react'
-import { useWallet } from 'hooks/useWallet'
-import ConnectWallet from 'components/ConnectWallets/ConnectWallet'
+import { useWallet } from '@/hooks/useWallet'
+import ConnectWallet from '@/components/ConnectWallets/ConnectWallet'
 import AccountSetting from './AccountSetting'
 
 const Header = () => {

@@ -1,1 +1,1 @@
-export { default } from 'views/demo-swap'
+export { default } from '@/views/demo-swap'

@@ -1,3 +1,4 @@
+"use client"
 import { useCallback, useEffect, useMemo } from 'react';
 import {
   Flex,
@@ -15,12 +16,12 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Token } from 'types/token'
-import TokenSelection from 'components/TokenSelection/TokenSelection'
-import { useSwap, SwapStatus } from 'hooks/useSwap'
-import { useToken } from 'hooks/useToken'
-import { DEFAULT_SWAP_FORM } from 'constant'
-import { convertGWeiToWei, convertWeiToGwei } from 'utils'
+import { Token } from '@/types/token'
+import TokenSelection from '@/components/TokenSelection/TokenSelection'
+import { useSwap, SwapStatus } from '@/hooks/useSwap'
+import { useToken } from '@/hooks/useToken'
+import { DEFAULT_SWAP_FORM } from '@/constant'
+import { convertGWeiToWei, convertWeiToGwei } from '@/utils'
 
 enum SwapFormField {
   inputToken = 'inputToken',

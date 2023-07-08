@@ -1,5 +1,5 @@
 import { atom, useAtom } from 'jotai'
-import { GOERLI_NETWORK_ID } from 'constant'
+import { GOERLI_NETWORK_ID } from '@/constant'
 // This is the default id used by the Hardhat Network
 
 const networkAtom = atom({

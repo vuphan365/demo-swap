@@ -1,4 +1,4 @@
-import type { SwapFormParams } from 'types/token'
+import type { SwapFormParams } from '@/types/token'
 
 export const GOERLI_NETWORK_ID = "0x5";
 

@@ -15,15 +15,15 @@ import {
   Percent,
   TradeType,
 } from '@uniswap/sdk-core'
-import type { Token } from 'types/token'
+import type { Token } from '@/types/token'
 import {
   ERC20_ABI,
   V3_SWAP_ROUTER_ADDRESS,
   TOKEN_AMOUNT_TO_APPROVE_FOR_TRANSFER,
   MAX_FEE_PER_GAS,
   MAX_PRIORITY_FEE_PER_GAS
-} from 'constant'
-import { convertGWeiToWei } from 'utils'
+} from '@/constant'
+import { convertGWeiToWei } from '@/utils'
 import { useWeb3 } from './useWeb3'
 import { useWallet } from './useWallet'
 import { BigNumber } from 'ethers'

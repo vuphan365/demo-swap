@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ethers } from "ethers";
 import { atom, useAtom } from 'jotai'
-import type { Token } from 'types/token'
+import type { Token } from '@/types/token'
 import { Token as SDKToken } from '@uniswap/sdk-core'
 import {
   ChainId,
 } from '@uniswap/smart-order-router'
 import { useWeb3 } from './useWeb3'
 import { useWallet } from './useWallet'
-import { DEFAULT_TOKEN_SELECTION, ERC20_ABI } from 'constant'
+import { DEFAULT_TOKEN_SELECTION, ERC20_ABI } from '@/constant'
 
 interface TokenSelectionValues {
   tokenList: Array<Token>
