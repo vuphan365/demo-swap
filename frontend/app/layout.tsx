@@ -1,6 +1,8 @@
 import React from 'react'
-import { Providers } from './providers'
+import ThemeProviders from '@/providers/ThemeProvider'
+import WagmiProvider from '@/providers/WagmiProvider'
 import Header from '@/components/Header/Header'
+
 export default function DashboardLayout({
   children, // will be a page or nested layout
 }: {
@@ -9,10 +11,12 @@ export default function DashboardLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>
-          <Header />
-          {children}
-        </Providers>
+        <ThemeProviders>
+          <WagmiProvider>
+            <Header />
+            {children}
+          </WagmiProvider>
+        </ThemeProviders>
       </body>
     </html>
   )

@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useState } from 'react'
-import { ethers } from "ethers";
+import { useEffect, useState } from 'react'
 import { atom, useAtom } from 'jotai'
 import type { Token } from '@/types/token'
 import { Token as SDKToken } from '@uniswap/sdk-core'
 import {
   ChainId,
 } from '@uniswap/smart-order-router'
-import { useWeb3 } from './useWeb3'
-import { useWallet } from './useWallet'
-import { DEFAULT_TOKEN_SELECTION, ERC20_ABI } from '@/constant'
+import { useAccount, erc20ABI } from 'wagmi'
+import { getContract } from '@wagmi/core'
+import { DEFAULT_TOKEN_SELECTION } from '@/constant'
 
 interface TokenSelectionValues {
   tokenList: Array<Token>
 }
+
 const tokenSelectionAtom = atom<TokenSelectionValues>({
   tokenList: []
 })
@@ -20,19 +20,19 @@ const tokenSelectionAtom = atom<TokenSelectionValues>({
 export function useTokenSelection() {
   const [isLoading, setIsLoading] = useState(false)
   const [tokenSelection, setTokenList] = useAtom(tokenSelectionAtom)
-  const { wallet, getWalletAddress } = useWallet()
-  const { getWeb3Provider } = useWeb3()
+  const { address } = useAccount()
 
-  const onGetToken = async (signer: any, tokenAddress: string, address: string): Promise<Token> => {
+  const onGetToken = async (tokenAddress: string, address: string): Promise<Token> => {
     try {
-      const tokenContract = new ethers.Contract(
-        tokenAddress,
-        ERC20_ABI,
-        signer
-      );
-      const name = await tokenContract?.name()
-      const balance = await tokenContract?.balanceOf(address)
-      const symbol = await tokenContract?.symbol()
+      const tokenContract = getContract({
+        address: tokenAddress as `0x${string}`,
+        abi: erc20ABI,
+      })
+      const [name, balance, symbol] = await Promise.all([
+        tokenContract?.read?.name(),
+        tokenContract?.read?.balanceOf([address]),
+        tokenContract?.read?.symbol()
+      ])
       const sdkToken = new SDKToken(
         ChainId.GÖRLI,
         tokenAddress,
@@ -49,10 +49,10 @@ export function useTokenSelection() {
       return null
     }
   }
-  const initTokenSelection = async (signer: any, address: string) => {
+  const initTokenSelection = async (address: string) => {
     try {
       setIsLoading(true)
-      const promise = DEFAULT_TOKEN_SELECTION.map((tokenAddress) => onGetToken(signer, tokenAddress, address))
+      const promise = DEFAULT_TOKEN_SELECTION.map((tokenAddress) => onGetToken(tokenAddress, address))
       const list = await Promise.all(promise)
       setTokenList({ tokenList: list.filter(token => !!token) })
     } catch (error) {
@@ -65,8 +65,7 @@ export function useTokenSelection() {
   const onSelectToken = async (tokenAddress) => {
     if (tokenSelection?.tokenList?.find((_token) => _token?.address === tokenAddress)) return
     setIsLoading(true)
-    const address = await getWalletAddress()
-    const token = await onGetToken(getWeb3Provider().getSigner(0), tokenAddress, address)
+    const token = await onGetToken(tokenAddress, address)
     if (token) {
       setTokenList(prev => ({
         ...prev,
@@ -77,11 +76,10 @@ export function useTokenSelection() {
   }
 
   useEffect(() => {
-    if (getWeb3Provider()?._isProvider && wallet?.address) {
-      initTokenSelection(getWeb3Provider().getSigner(0), wallet?.address)
+    if (address) {
+      initTokenSelection(address)
     }
-  }, [getWeb3Provider, wallet?.address])
-
+  }, [address])
 
   return {
     tokenList: tokenSelection?.tokenList,
