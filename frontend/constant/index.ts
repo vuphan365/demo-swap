@@ -26,7 +26,9 @@ export const DEFAULT_SWAP_FORM: SwapFormParams = {
   outputToken: null,
   inputAmount: null,
   inputToken: null,
-  outputAmount: null
+  outputAmount: null,
+  gasPrice: 2,
+  slippage: 0.005
 }
 
 export const POOL_FACTORY_CONTRACT_ADDRESS =

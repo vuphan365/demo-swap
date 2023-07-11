@@ -3,9 +3,9 @@ import { atom, useAtom } from 'jotai'
 import {
   ChainId,
   AlphaRouter,
+  SwapRoute,
   SwapOptionsSwapRouter02,
   SwapType,
-  SwapRoute
 } from '@uniswap/smart-order-router'
 import { useToast } from '@chakra-ui/react'
 import { ethers } from 'ethers'
@@ -15,8 +15,8 @@ import {
   Percent,
   TradeType,
 } from '@uniswap/sdk-core'
-import { useAccount, useNetwork } from 'wagmi'
-import { sendTransaction, prepareSendTransaction } from '@wagmi/core'
+import { useAccount, useNetwork, useFeeData } from 'wagmi'
+import { sendTransaction, prepareSendTransaction, fetchFeeData, waitForTransaction } from '@wagmi/core'
 import type { Token } from '@/types/token'
 import {
   ERC20_ABI,
@@ -25,14 +25,16 @@ import {
   MAX_FEE_PER_GAS,
   MAX_PRIORITY_FEE_PER_GAS
 } from '@/constant'
-import { convertGWeiToWei } from '@/utils'
+import { convertEthersToWei, convertGweiToWei } from '@/utils'
 import { useWeb3Provider } from './useEthers'
 import { BigNumber } from 'ethers'
 
 type GeneralSwapParams = {
   tokenIn: Token,
   inAmount: BigNumber
-  tokenOut: Token
+  tokenOut: Token,
+  gasPrice?: number,
+  slippage?: number
 }
 
 type ExecuteSwapParams = GeneralSwapParams & {
@@ -87,11 +89,11 @@ export const useSwap = () => {
       const router = new AlphaRouter({
         chainId: chain.id,
         // @ts-ignore
-        provider: web3Provider
+        provider: web3Provider,
       })
       const options: SwapOptionsSwapRouter02 = {
         recipient: address,
-        slippageTolerance: new Percent(50, 10_000),
+        slippageTolerance: new Percent(params.slippage ? params.slippage * 10000 : 50, 10_000),
         deadline: Math.floor(Date.now() / 1000 + 1800),
         type: SwapType.SWAP_ROUTER_02,
       }
@@ -110,7 +112,7 @@ export const useSwap = () => {
       setSwapState(prev => ({
         ...prev,
         route,
-        quote: ethers.BigNumber.from(convertGWeiToWei(route?.quote?.toFixed())),
+        quote: ethers.BigNumber.from(convertEthersToWei(route?.quote?.toFixed())),
         status: SwapStatus.QUOTED
       }))
     } catch (error) {
@@ -120,9 +122,9 @@ export const useSwap = () => {
         status: SwapStatus.TX_FAILED
       }))
     }
-  }, 500), [address, web3Provider])
+  }, 500), [address, web3Provider, chain])
 
-  const executeSwap = useCallback(async ({ tokenIn, tokenOut, onSwapSuccess }: ExecuteSwapParams) => {
+  const executeSwap = useCallback(async ({ tokenIn, tokenOut, onSwapSuccess, gasPrice }: ExecuteSwapParams) => {
     const toastId = toast({
       position: 'top-right',
       status: "info",
@@ -134,15 +136,18 @@ export const useSwap = () => {
         ...prev,
         txStatus: SwapStatus?.TX_NEW
       }))
+      const fee = await fetchFeeData({ chainId: chain.id })
       const config = await prepareSendTransaction({
+        chainId: chain.id,
         data: swapState?.route?.methodParameters?.calldata,
         to: V3_SWAP_ROUTER_ADDRESS,
         value: swapState?.route?.methodParameters?.value,
         from: address,
-        maxFeePerGas: MAX_FEE_PER_GAS,
-        maxPriorityFeePerGas: MAX_PRIORITY_FEE_PER_GAS,
+        maxFeePerGas: convertGweiToWei(gasPrice).add(fee.lastBaseFeePerGas).add(fee.lastBaseFeePerGas),
+        maxPriorityFeePerGas: convertGweiToWei(gasPrice),
       })
-      const res = await sendTransaction(config)
+      const hash = await sendTransaction(config)
+      const res = await waitForTransaction(hash)
       toast.close(toastId)
       toast({
         position: 'top-right',
@@ -150,7 +155,6 @@ export const useSwap = () => {
         title: "Swap successfully",
       })
       onSwapSuccess(tokenIn, tokenOut)
-      // update state
       return res
     } catch (error) {
       console.log('error', error)
@@ -159,10 +163,11 @@ export const useSwap = () => {
         position: 'top-right',
         status: "error",
         title: "Failed to send transaction",
+        description: error?.message?.split('.')?.[0]
       })
       return null
     }
-  }, [swapState?.route, address, sendTransaction])
+  }, [swapState, address, sendTransaction, chain])
 
   return {
     createSwap,

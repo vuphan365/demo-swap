@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 
-export const convertWeiToGwei = (num, limit?: number) => {
+export const convertWeiToEthers = (num, limit?: number) => {
   const output = ethers.utils.formatEther(num)
   if (limit) {
     return (+output).toFixed(limit)
@@ -8,6 +8,10 @@ export const convertWeiToGwei = (num, limit?: number) => {
   return output
 }
 
-export const convertGWeiToWei = (num) => {
+export const convertEthersToWei = (num) => {
   return ethers.utils.parseUnits(num.toString(), 18)
+}
+
+export const convertGweiToWei = (num) => {
+  return ethers.utils.parseUnits(num.toString(), 9)
 }

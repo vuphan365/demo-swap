@@ -11,39 +11,38 @@ import {
   InputRightElement,
   Spinner,
   FormControl,
-  FormErrorMessage
+  FormErrorMessage,
+  useColorModeValue
 } from '@chakra-ui/react'
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Token } from '@/types/token'
+import { SwapFormField } from '@/types/swap'
 import TokenSelection from '@/components/TokenSelection/TokenSelection'
 import { useSwap, SwapStatus } from '@/hooks/useSwap'
 import { useToken } from '@/hooks/useToken'
 import { DEFAULT_SWAP_FORM } from '@/constant'
-import { convertGWeiToWei, convertWeiToGwei } from '@/utils'
-
-enum SwapFormField {
-  inputToken = 'inputToken',
-  inputAmount = 'inputAmount',
-  outputToken = 'outputToken',
-  outputAmount = 'outputAmount'
-}
+import { convertEthersToWei, convertWeiToEthers } from '@/utils'
+import SwapSetting from './SwapSettings';
 
 const validationSchema = yup.object({
   [SwapFormField.inputAmount]: yup.number().when(SwapFormField.inputToken, ([inputToken], schema) => {
-    if (!inputToken) return schema.required("You must input balance")
+    if (!inputToken) return schema.required("You must input amount")
     //@ts-ignore
-    return schema.max(Number(convertWeiToGwei(inputToken?.balance?.toString(), 4)), "You can only swap less than you balance").min(0, "Swap value must greater than 0")
-  }),
+    return schema.max(Number(convertWeiToEthers(inputToken?.balance?.toString(), 4)), "You can only swap less than you balance").min(0, "Swap value must greater than 0")
+  }).typeError("You must input amount"),
   [SwapFormField.outputAmount]: null,
   [SwapFormField.outputToken]: null,
   [SwapFormField.inputToken]: null,
+  [SwapFormField.gasPrice]: null,
+  [SwapFormField.slippage]: yup.number().max(1, "You only can set slippage to 100%").typeError("You must slippate rate"),
 });
 
 const SwapForm = () => {
   const { register, handleSubmit, formState: { errors, isValid }, trigger, control, watch, setValue } = useForm({
     defaultValues: DEFAULT_SWAP_FORM,
+    // @ts-ignore
     resolver: yupResolver(validationSchema),
     mode: "onChange"
   });
@@ -52,8 +51,16 @@ const SwapForm = () => {
   const tokenIn = watch(SwapFormField.inputToken)
   const tokenOut = watch(SwapFormField.outputToken)
   const inputAmount = watch(SwapFormField.inputAmount)
+  const slippage = watch(SwapFormField.slippage)
   const isOutputLoading = useMemo(() => swapStatus === SwapStatus.QUOTING, [swapStatus])
+  const bg = useColorModeValue("white", "gray.800")
+  const disabledBg = useColorModeValue('gray.100', "gray.700")
 
+  const onSetMaxInput = useCallback(() => {
+    if (tokenIn) {
+      setValue(SwapFormField.inputAmount, convertWeiToEthers(tokenIn.balance.toString()))
+    }
+  }, [tokenIn])
   const onSwapSuccess = useCallback(async (tokenIn: Token, tokenOut: Token) => {
     const [newTokenIn, newTokenOut] = await Promise.all([
       getLatestTokenBalance(tokenIn),
@@ -68,7 +75,8 @@ const SwapForm = () => {
     executeSwap({
       tokenIn: values?.inputToken,
       tokenOut: values?.outputToken,
-      inAmount: convertGWeiToWei(values?.inputAmount),
+      inAmount: convertEthersToWei(values?.inputAmount),
+      gasPrice: values?.gasPrice,
       onSwapSuccess
     })
   }, [executeSwap])
@@ -78,25 +86,27 @@ const SwapForm = () => {
       createSwap({
         tokenIn,
         tokenOut,
-        inAmount: convertGWeiToWei(inputAmount)
+        inAmount: convertEthersToWei(inputAmount),
+        slippage
       })
     }
-  }, [createSwap, inputAmount, tokenIn, tokenOut])
+  }, [createSwap, inputAmount, tokenIn, tokenOut, slippage])
 
   useEffect(() => {
     if (swapStatus === SwapStatus.QUOTED && swapQuote) {
-      setValue(SwapFormField.outputAmount, convertWeiToGwei(swapQuote))
+      setValue(SwapFormField.outputAmount, convertWeiToEthers(swapQuote, 8))
     }
   }, [swapQuote, swapStatus])
 
 
   return (
-    <Flex bg="white" as="form" padding={6} boxShadow="base" flexDir="column" minW="350px" alignItems="center" justifyContent="center" gap="16px" onSubmit={handleSubmit(onSubmit)} borderRadius="24px">
+    <Flex bg={bg} as="form" padding={6} boxShadow="base" flexDir="column" minW="350px" alignItems="center" justifyContent="center" gap="16px" onSubmit={handleSubmit(onSubmit)} borderRadius="24px">
       <Box width="100%">
         <Heading as="h4" size="md">Swap</Heading>
         <Text fontSize="sm" mt="2">Trade tokens in an instant</Text>
       </Box>
-      <Flex flexDir="column" gap="8px" w="100%">
+      <SwapSetting control={control} />
+      <Flex flexDir="column" gap="4px" w="100%">
         <Controller
           name={SwapFormField.inputToken}
           control={control}
@@ -108,18 +118,26 @@ const SwapForm = () => {
             />}
         />
         <FormControl isInvalid={Boolean(errors?.inputAmount)}>
-          <Input
-            // isDisabled={!tokenIn}
-            max={tokenIn && Number(convertWeiToGwei(tokenIn?.balance?.toString(), 4))}
-            {...register(SwapFormField.inputAmount)}
-            _disabled={{
-              bg: 'gray.100'
-            }}
-          />
-          <FormErrorMessage>{errors?.inputAmount?.message as String}</FormErrorMessage>
+          <InputGroup>
+            <Input
+              // isDisabled={!tokenIn}
+              max={tokenIn && Number(convertWeiToEthers(tokenIn?.balance?.toString(), 4))}
+              {...register(SwapFormField.inputAmount)}
+              _disabled={{
+                bg: disabledBg
+              }}
+              px="16px"
+              py="20px"
+              fontSize={20}
+            />
+            <InputRightElement mx="8px">
+              <Button isDisabled={!tokenIn} mx="8px" variant="ghost" onClick={onSetMaxInput}>Max</Button>
+            </InputRightElement>
+          </InputGroup>
+          <FormErrorMessage>{errors?.inputAmount?.message as string}</FormErrorMessage>
         </FormControl>
       </Flex>
-      <Flex flexDir="column" gap="8px" w="100%">
+      <Flex flexDir="column" gap="4px" w="100%">
         <Controller
           name={SwapFormField.outputToken}
           control={control}
@@ -130,8 +148,11 @@ const SwapForm = () => {
             isDisabled={true}
             {...register(SwapFormField.outputAmount)}
             _disabled={{
-              bg: 'gray.100'
+              bg: disabledBg
             }}
+            px="16px"
+            py="20px"
+            fontSize={20}
           />
           {isOutputLoading && (
             <InputRightElement>
@@ -139,6 +160,7 @@ const SwapForm = () => {
             </InputRightElement>
           )}
         </InputGroup>
+        <Text mt={2} fontSize="xs" textAlign="right">Slippage Tolerance: {(slippage * 100).toLocaleString()} %</Text>
       </Flex>
       <Button
         w="100%"
