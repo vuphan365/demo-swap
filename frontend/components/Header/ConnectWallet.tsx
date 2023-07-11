@@ -10,9 +10,6 @@ const ConnectWallet = () => {
     connector: new InjectedConnector(),
   })
 
-  useEffect(() => {
-    connect()
-  }, [connect])
   return (
     <Button leftIcon={<LinkIcon />} colorScheme='blue' onClick={() => connect()} borderRadius="16px" px={6}>
       <Heading as="h5" size="sm">
