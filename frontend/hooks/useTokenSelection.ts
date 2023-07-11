@@ -29,8 +29,11 @@ export function useTokenSelection() {
         abi: erc20ABI,
       })
       const [name, balance, symbol] = await Promise.all([
+        // @ts-ignore
         tokenContract?.read?.name(),
+        // @ts-ignore
         tokenContract?.read?.balanceOf([address]),
+        // @ts-ignore
         tokenContract?.read?.symbol()
       ])
       const sdkToken = new SDKToken(

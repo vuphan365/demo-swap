@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { type PublicClient, usePublicClient, useNetwork } from 'wagmi'
 import * as React from 'react'
 import { providers } from 'ethers'
@@ -5,6 +6,7 @@ import { type HttpTransport } from 'viem'
 
 export function publicClientToProvider(publicClient: PublicClient) {
   const { chain, transport } = publicClient
+
   const network = {
     chainId: chain.id,
     name: chain.name,
