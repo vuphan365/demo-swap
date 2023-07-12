@@ -3,9 +3,9 @@ import { atom, useAtom } from 'jotai'
 import {
   ChainId,
   AlphaRouter,
+  SwapRoute,
   SwapOptionsSwapRouter02,
   SwapType,
-  SwapRoute
 } from '@uniswap/smart-order-router'
 import { useToast } from '@chakra-ui/react'
 import { ethers } from 'ethers'
@@ -15,6 +15,8 @@ import {
   Percent,
   TradeType,
 } from '@uniswap/sdk-core'
+import { useAccount, useNetwork, useFeeData } from 'wagmi'
+import { sendTransaction, prepareSendTransaction, fetchFeeData, waitForTransaction } from '@wagmi/core'
 import type { Token } from '@/types/token'
 import {
   ERC20_ABI,
@@ -23,15 +25,16 @@ import {
   MAX_FEE_PER_GAS,
   MAX_PRIORITY_FEE_PER_GAS
 } from '@/constant'
-import { convertGWeiToWei } from '@/utils'
-import { useWeb3 } from './useWeb3'
-import { useWallet } from './useWallet'
+import { convertEthersToWei, convertGweiToWei } from '@/utils'
+import { useWeb3Provider } from './useEthers'
 import { BigNumber } from 'ethers'
 
 type GeneralSwapParams = {
   tokenIn: Token,
   inAmount: BigNumber
-  tokenOut: Token
+  tokenOut: Token,
+  gasPrice?: number,
+  slippage?: number
 }
 
 type ExecuteSwapParams = GeneralSwapParams & {
@@ -60,65 +63,16 @@ const swapAtom = atom<SwapAtom>({
 
 export const useSwap = () => {
   const [swapState, setSwapState] = useAtom(swapAtom)
-  const { web3, sendTransaction, getWeb3Provider } = useWeb3()
-  const { getWalletAddress } = useWallet()
+  const { address } = useAccount()
   const toast = useToast()
-
-  // const { getPoolInfo } = usePool()
-
-  // async function getOutputQuote(route: Route<Currency, Currency>, params: GeneralSwapParams) {
-  //   const { calldata } = await SwapQuoter.quoteCallParameters(
-  //     route,
-  //     CurrencyAmount.fromRawAmount(
-  //       params?.tokenIn,
-  //       params?.inAmount?.toString()
-  //     ),
-  //     TradeType.EXACT_INPUT,
-  //     {
-  //       useQuoterV2: true,
-  //     }
-  //   )
-
-  //   const quoteCallReturnData = await getWeb3Provider().call({
-  //     to: QUOTER_CONTRACT_ADDRESS,
-  //     data: calldata,
-  //   })
-
-
-  //   return ethers.utils.defaultAbiCoder.decode(['uint256'], quoteCallReturnData)
-  // }
-
-  const getTokenTransferApproval = useCallback(async (token: Token) => {
-    try {
-      const tokenContract = new ethers.Contract(
-        token?.address,
-        ERC20_ABI,
-        getWeb3Provider()
-      )
-      const unsignedTransaction = await tokenContract.populateTransaction.approve(
-        V3_SWAP_ROUTER_ADDRESS,
-        BigNumber.from(TOKEN_AMOUNT_TO_APPROVE_FOR_TRANSFER)
-      )
-      await web3.provider.getSigner(0).sendUncheckedTransaction(unsignedTransaction)
-      return SwapStatus.TX_SIGNED
-    } catch (e) {
-      console.log('e', e)
-      toast({
-        position: 'top-right',
-        status: "error",
-        title: "Failed to sign contract"
-      })
-      return SwapStatus.TX_FAILED
-    }
-  }, [getWeb3Provider, sendTransaction])
+  const web3Provider = useWeb3Provider()
+  const { chain } = useNetwork()
 
   const createSwap = useCallback(debounce(async (params: GeneralSwapParams) => {
     try {
-      const address = await getWalletAddress()
-      const provider = getWeb3Provider();
-      if (!address || !provider) return
+      if (!address || !web3Provider) return
       const { inAmount, tokenIn, tokenOut } = params
-      if (tokenIn.balance.lt(inAmount)) {
+      if (inAmount.gt(tokenIn.balance)) {
         setSwapState((prev) => ({
           ...prev,
           route: null,
@@ -133,12 +87,13 @@ export const useSwap = () => {
       }))
 
       const router = new AlphaRouter({
-        chainId: ChainId.GÖRLI,
-        provider: getWeb3Provider()
+        chainId: chain.id,
+        // @ts-ignore
+        provider: web3Provider,
       })
       const options: SwapOptionsSwapRouter02 = {
         recipient: address,
-        slippageTolerance: new Percent(50, 10_000),
+        slippageTolerance: new Percent(params.slippage ? params.slippage * 10000 : 50, 10_000),
         deadline: Math.floor(Date.now() / 1000 + 1800),
         type: SwapType.SWAP_ROUTER_02,
       }
@@ -157,15 +112,19 @@ export const useSwap = () => {
       setSwapState(prev => ({
         ...prev,
         route,
-        quote: ethers.BigNumber.from(convertGWeiToWei(route?.quote?.toFixed())),
+        quote: ethers.BigNumber.from(convertEthersToWei(route?.quote?.toFixed())),
         status: SwapStatus.QUOTED
       }))
     } catch (error) {
       console.log('error', error)
+      setSwapState(prev => ({
+        ...prev,
+        status: SwapStatus.TX_FAILED
+      }))
     }
-  }, 500), [getWeb3Provider, getWalletAddress])
+  }, 500), [address, web3Provider, chain])
 
-  const executeSwap = useCallback(async ({ tokenIn, tokenOut, onSwapSuccess }: ExecuteSwapParams) => {
+  const executeSwap = useCallback(async ({ tokenIn, tokenOut, onSwapSuccess, gasPrice }: ExecuteSwapParams) => {
     const toastId = toast({
       position: 'top-right',
       status: "info",
@@ -177,17 +136,18 @@ export const useSwap = () => {
         ...prev,
         txStatus: SwapStatus?.TX_NEW
       }))
-      const address = await getWalletAddress()
-      const approval = await getTokenTransferApproval(tokenIn)
-      if (approval !== SwapStatus.TX_SIGNED) return
-      const res = await sendTransaction({
+      const fee = await fetchFeeData({ chainId: chain.id })
+      const config = await prepareSendTransaction({
+        chainId: chain.id,
         data: swapState?.route?.methodParameters?.calldata,
         to: V3_SWAP_ROUTER_ADDRESS,
         value: swapState?.route?.methodParameters?.value,
         from: address,
-        maxFeePerGas: MAX_FEE_PER_GAS,
-        maxPriorityFeePerGas: MAX_PRIORITY_FEE_PER_GAS,
+        maxFeePerGas: convertGweiToWei(gasPrice).add(fee.lastBaseFeePerGas).add(fee.lastBaseFeePerGas),
+        maxPriorityFeePerGas: convertGweiToWei(gasPrice),
       })
+      const hash = await sendTransaction(config)
+      const res = await waitForTransaction(hash)
       toast.close(toastId)
       toast({
         position: 'top-right',
@@ -195,18 +155,19 @@ export const useSwap = () => {
         title: "Swap successfully",
       })
       onSwapSuccess(tokenIn, tokenOut)
-      // update state
       return res
     } catch (error) {
+      console.log('error', error)
       toast.close(toastId)
       toast({
         position: 'top-right',
         status: "error",
         title: "Failed to send transaction",
+        description: error?.message?.split('.')?.[0]
       })
       return null
     }
-  }, [swapState?.route, getWalletAddress, getWeb3Provider, sendTransaction])
+  }, [swapState, address, sendTransaction, chain])
 
   return {
     createSwap,

@@ -8,7 +8,9 @@ export interface Token extends SwapToken {
 
 export interface SwapFormParams {
   outputToken: Token | null,
-  inputAmount: number | null,
+  inputAmount: number | string | null,
   inputToken: Token | null,
-  outputAmount: number | null,
+  outputAmount: number | string | null,
+  gasPrice?: number,
+  slippage?: number
 }

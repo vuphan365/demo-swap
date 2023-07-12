@@ -11,11 +11,12 @@ import {
   Text,
   Button,
   Box,
-  Spinner
+  Spinner,
+  useColorModeValue
 } from '@chakra-ui/react'
 import { MoonIcon } from '@chakra-ui/icons'
 import { TOKEN_ADDRESS_LENGTH } from '@/constant'
-import { convertWeiToGwei } from '@/utils'
+import { convertWeiToEthers } from '@/utils'
 import { Token } from '@/types/token'
 import { useTokenSelection } from '@/hooks/useTokenSelection'
 
@@ -29,6 +30,7 @@ interface TokenSearchModalParams {
 const TokenSearchModal: FC<TokenSearchModalParams> = ({ isOpen, onClose, defaultToken, disabledTokenAddress }) => {
   const { tokenList, onSelectToken, isLoading } = useTokenSelection()
   const [currentToken, setCurrentToken] = useState(defaultToken || "")
+  const modalBg = useColorModeValue("white", "gray.800")
 
   const onChangeCurrentToken = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e?.target?.value
@@ -56,9 +58,9 @@ const TokenSearchModal: FC<TokenSearchModalParams> = ({ isOpen, onClose, default
   if (!isOpen) return null
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCentered>
+    <Modal isOpen={isOpen} onClose={onClose} isCentered >
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent bg={modalBg}>
         <ModalHeader>Select a Token </ModalHeader>
         <ModalCloseButton />
         <ModalBody pb="24px">
@@ -81,7 +83,7 @@ const TokenSearchModal: FC<TokenSearchModalParams> = ({ isOpen, onClose, default
                     <Text fontSize="md" textTransform="uppercase" fontWeight="bold">{token?.symbol}</Text>
                     <Text fontSize="xs" mt="4px">{token?.name}</Text>
                   </Box>
-                  <Text fontSize="md">{convertWeiToGwei(token?.balance?.toString(), 4)}</Text>
+                  <Text fontSize="md">{convertWeiToEthers(token?.balance?.toString(), 4)}</Text>
                 </Flex>
               </Button>
             ))}
