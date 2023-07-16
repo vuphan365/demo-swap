@@ -30,6 +30,8 @@ const buttonProps = {
   colorScheme: 'linkedin',
   variant: 'outline',
   borderRadius: "16px",
+  marginInlineStart: '0px !important',
+  borderWidth: 0
   // pb: '2px'
 }
 
@@ -82,7 +84,7 @@ const SwapSetting: FC<SwapSettingParams> = ({ control }) => {
                 control={control}
                 name={SwapFormField.gasPrice}
                 render={({ field: { onChange, value } }) => (
-                  <ButtonGroup mt={4} borderRadius={6}>
+                  <ButtonGroup mt={4} borderRadius="16px" borderWidth="2px" p="1px">
                     {GasPriceOptions.map(({ name, value: _value }) => (
                       <Button {...buttonProps} key={`gas-price-${_value}`} variant={value === _value ? 'solid' : buttonProps.variant} onClick={() => onChange(_value)}>{name} ({_value})</Button>
                     ))}
@@ -98,7 +100,7 @@ const SwapSetting: FC<SwapSettingParams> = ({ control }) => {
                 name={SwapFormField.slippage}
                 render={({ field: { onChange, value }, formState }) => (
                   <FormControl isInvalid={Boolean(formState?.errors?.slippage)}>
-                    <ButtonGroup mt={4} borderRadius={6}>
+                    <ButtonGroup mt={4} borderRadius="16px" borderWidth="2px" p="1px">
                       {SlippageRate.map((rate) => (
                         <Button {...buttonProps} key={`slippage-rate-${rate}`} variant={value === rate ? 'solid' : buttonProps.variant} onClick={() => onChange(rate)} >{(rate * 100).toFixed(1)}%</Button>
                       ))}

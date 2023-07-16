@@ -114,29 +114,54 @@ const SwapForm = () => {
   }, [swapQuote, swapStatus])
 
   return (
-    <Flex bg={bg} as="form" padding={6} boxShadow="base" flexDir="column" minW="350px" alignItems="center" justifyContent="center" gap="16px" onSubmit={handleSubmit(onSubmit)} borderRadius="24px">
-      <Box width="100%">
-        <Heading as="h4" size="md">Swap</Heading>
-        <Text fontSize="sm" mt="2">Trade tokens in an instant</Text>
-      </Box>
-      <SwapSetting control={control} />
-      <Flex flexDir="column" gap="4px" w="100%">
-        <Controller
-          name={SwapFormField.inputToken}
-          control={control}
-          render={({ field: { onChange, value } }) =>
-            <TokenSelection
-              value={value}
-              onChange={onChange}
-              disabledToken={watch(SwapFormField.outputToken)}
-            />}
-        />
-        <FormControl isInvalid={Boolean(errors?.inputAmount)}>
+    <Flex alignItems="flex-start">
+      <Flex bg={bg} as="form" padding={6} boxShadow="base" flexDir="column" minW={["320px", "350px"]} alignItems="center" justifyContent="center" gap="16px" onSubmit={handleSubmit(onSubmit)} borderRadius="24px">
+        <Box width="100%">
+          <Heading as="h4" size="md">Swap</Heading>
+          <Text fontSize="sm" mt="2">Trade tokens in an instant</Text>
+        </Box>
+        <SwapSetting control={control} />
+        <Flex flexDir="column" gap="4px" w="100%">
+          <Controller
+            name={SwapFormField.inputToken}
+            control={control}
+            render={({ field: { onChange, value } }) =>
+              <TokenSelection
+                value={value}
+                onChange={onChange}
+                disabledToken={watch(SwapFormField.outputToken)}
+              />}
+          />
+          <FormControl isInvalid={Boolean(errors?.inputAmount)}>
+            <InputGroup>
+              <Input
+                // isDisabled={!tokenIn}
+                max={tokenIn && Number(convertWeiToEthers(tokenIn?.balance?.toString(), 4))}
+                {...register(SwapFormField.inputAmount)}
+                _disabled={{
+                  bg: disabledBg
+                }}
+                px="16px"
+                py="20px"
+                fontSize={20}
+              />
+              <InputRightElement mx="8px">
+                <Button isDisabled={!tokenIn} mx="8px" variant="ghost" onClick={onSetMaxInput}>Max</Button>
+              </InputRightElement>
+            </InputGroup>
+            <FormErrorMessage>{errors?.inputAmount?.message as string}</FormErrorMessage>
+          </FormControl>
+        </Flex>
+        <Flex flexDir="column" gap="4px" w="100%">
+          <Controller
+            name={SwapFormField.outputToken}
+            control={control}
+            render={({ field: { onChange, value } }) => <TokenSelection value={value} onChange={onChange} disabledToken={watch(SwapFormField.inputToken)} />}
+          />
           <InputGroup>
             <Input
-              // isDisabled={!tokenIn}
-              max={tokenIn && Number(convertWeiToEthers(tokenIn?.balance?.toString(), 4))}
-              {...register(SwapFormField.inputAmount)}
+              isDisabled={true}
+              {...register(SwapFormField.outputAmount)}
               _disabled={{
                 bg: disabledBg
               }}
@@ -144,47 +169,24 @@ const SwapForm = () => {
               py="20px"
               fontSize={20}
             />
-            <InputRightElement mx="8px">
-              <Button isDisabled={!tokenIn} mx="8px" variant="ghost" onClick={onSetMaxInput}>Max</Button>
-            </InputRightElement>
+            {isOutputLoading && (
+              <InputRightElement>
+                <Spinner />
+              </InputRightElement>
+            )}
           </InputGroup>
-          <FormErrorMessage>{errors?.inputAmount?.message as string}</FormErrorMessage>
-        </FormControl>
+          <Text mt={2} fontSize="xs" textAlign="right">Slippage Tolerance: {(slippage * 100).toLocaleString()} %</Text>
+        </Flex>
+        <Button
+          w="100%"
+          isLoading={isOutputLoading || approveStatus === ApproveStatus.LOADING}
+          isDisabled={!swapQuote || !isValid}
+          colorScheme='blue'
+          type="submit"
+        >
+          {approveStatus !== ApproveStatus.APPROVED ? 'Approve' : 'Swap'}
+        </Button>
       </Flex>
-      <Flex flexDir="column" gap="4px" w="100%">
-        <Controller
-          name={SwapFormField.outputToken}
-          control={control}
-          render={({ field: { onChange, value } }) => <TokenSelection value={value} onChange={onChange} disabledToken={watch(SwapFormField.inputToken)} />}
-        />
-        <InputGroup>
-          <Input
-            isDisabled={true}
-            {...register(SwapFormField.outputAmount)}
-            _disabled={{
-              bg: disabledBg
-            }}
-            px="16px"
-            py="20px"
-            fontSize={20}
-          />
-          {isOutputLoading && (
-            <InputRightElement>
-              <Spinner />
-            </InputRightElement>
-          )}
-        </InputGroup>
-        <Text mt={2} fontSize="xs" textAlign="right">Slippage Tolerance: {(slippage * 100).toLocaleString()} %</Text>
-      </Flex>
-      <Button
-        w="100%"
-        isLoading={isOutputLoading || approveStatus === ApproveStatus.LOADING}
-        isDisabled={!swapQuote || !isValid}
-        colorScheme='blue'
-        type="submit"
-      >
-        {approveStatus !== ApproveStatus.APPROVED ? 'Approve' : 'Swap'}
-      </Button>
     </Flex>
   )
 }

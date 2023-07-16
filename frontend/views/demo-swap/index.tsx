@@ -1,6 +1,7 @@
 "use client"
 import { Box, Flex, useColorModeValue } from '@chakra-ui/react'
 import SwapForm from './components/SwapForm'
+import TradingView from './components/TradingView'
 
 const Swap = () => {
   const bgGradient = useColorModeValue([
@@ -12,10 +13,14 @@ const Swap = () => {
     <Flex
       minHeight="calc(100vh - 56px)"
       width="100%"
-      alignItems="center"
-      justifyContent="center"
+      gap="36px"
+      alignItems="stretch"
+      justifyContent="space-between"
+      p="36px"
       bgGradient={bgGradient}
+      flexDir={["column-reverse", "row"]}
     >
+      <TradingView />
       <SwapForm />
     </Flex>
   )
