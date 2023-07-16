@@ -1,7 +1,6 @@
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { atom, useAtom } from 'jotai'
 import {
-  ChainId,
   AlphaRouter,
   SwapRoute,
   SwapOptionsSwapRouter02,
@@ -15,15 +14,11 @@ import {
   Percent,
   TradeType,
 } from '@uniswap/sdk-core'
-import { useAccount, useNetwork, useFeeData } from 'wagmi'
+import { useAccount, useNetwork } from 'wagmi'
 import { sendTransaction, prepareSendTransaction, fetchFeeData, waitForTransaction } from '@wagmi/core'
 import type { Token } from '@/types/token'
 import {
-  ERC20_ABI,
   V3_SWAP_ROUTER_ADDRESS,
-  TOKEN_AMOUNT_TO_APPROVE_FOR_TRANSFER,
-  MAX_FEE_PER_GAS,
-  MAX_PRIORITY_FEE_PER_GAS
 } from '@/constant'
 import { convertEthersToWei, convertGweiToWei } from '@/utils'
 import { useWeb3Provider } from './useEthers'
@@ -67,10 +62,14 @@ export const useSwap = () => {
   const toast = useToast()
   const web3Provider = useWeb3Provider()
   const { chain } = useNetwork()
+  const signCode = useRef<number>()
+
 
   const createSwap = useCallback(debounce(async (params: GeneralSwapParams) => {
+    const sign = Math.random()
     try {
       if (!address || !web3Provider) return
+      signCode.current = sign
       const { inAmount, tokenIn, tokenOut } = params
       if (inAmount.gt(tokenIn.balance)) {
         setSwapState((prev) => ({
@@ -109,14 +108,16 @@ export const useSwap = () => {
         TradeType.EXACT_INPUT,
         options
       )
+      if (signCode.current !== sign) return
       setSwapState(prev => ({
         ...prev,
         route,
         quote: ethers.BigNumber.from(convertEthersToWei(route?.quote?.toFixed())),
-        status: SwapStatus.QUOTED
+        status: SwapStatus.QUOTED,
       }))
     } catch (error) {
       console.log('error', error)
+      if (signCode.current !== sign) return
       setSwapState(prev => ({
         ...prev,
         status: SwapStatus.TX_FAILED
@@ -125,7 +126,7 @@ export const useSwap = () => {
   }, 500), [address, web3Provider, chain])
 
   const executeSwap = useCallback(async ({ tokenIn, tokenOut, onSwapSuccess, gasPrice }: ExecuteSwapParams) => {
-    const toastId = toast({
+    let toastId = toast({
       position: 'top-right',
       status: "info",
       title: "Swapping",
@@ -148,6 +149,7 @@ export const useSwap = () => {
       })
       const hash = await sendTransaction(config)
       const res = await waitForTransaction(hash)
+      console.log('swap', res)
       toast.close(toastId)
       toast({
         position: 'top-right',
@@ -173,6 +175,6 @@ export const useSwap = () => {
     createSwap,
     executeSwap,
     quote: swapState?.quote,
-    status: swapState?.status
+    status: swapState?.status,
   }
 }
