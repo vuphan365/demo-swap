@@ -56,3 +56,5 @@ export const ERC20_ABI = [
   // Events
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ]
+
+export const isDev = process.env.NEXT_PUBLIC_ENV === 'dev'
