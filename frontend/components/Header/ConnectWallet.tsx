@@ -4,11 +4,18 @@ import { LinkIcon } from '@chakra-ui/icons'
 import { useConnect } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { useEffect } from 'react'
+import { isDev } from '@/constant'
 
 const ConnectWallet = () => {
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   })
+
+  useEffect(() => {
+    if (isDev) {
+      connect()
+    }
+  }, [])
 
   return (
     <Button leftIcon={<LinkIcon />} colorScheme='blue' onClick={() => connect()} borderRadius="16px" px={6}>

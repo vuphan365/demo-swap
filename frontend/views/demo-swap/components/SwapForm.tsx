@@ -21,6 +21,7 @@ import { Token } from '@/types/token'
 import { SwapFormField } from '@/types/swap'
 import TokenSelection from '@/components/TokenSelection/TokenSelection'
 import { useSwap, SwapStatus } from '@/hooks/useSwap'
+import { useApprove, ApproveStatus } from '@/hooks/useApprove'
 import { useToken } from '@/hooks/useToken'
 import { DEFAULT_SWAP_FORM } from '@/constant'
 import { convertEthersToWei, convertWeiToEthers } from '@/utils'
@@ -47,6 +48,7 @@ const SwapForm = () => {
     mode: "onChange"
   });
   const { createSwap, quote: swapQuote, status: swapStatus, executeSwap } = useSwap()
+  const { approveStatus, onApproveToken, onCheckTokenApprove } = useApprove()
   const { getLatestTokenBalance } = useToken()
   const tokenIn = watch(SwapFormField.inputToken)
   const tokenOut = watch(SwapFormField.outputToken)
@@ -59,8 +61,10 @@ const SwapForm = () => {
   const onSetMaxInput = useCallback(() => {
     if (tokenIn) {
       setValue(SwapFormField.inputAmount, convertWeiToEthers(tokenIn.balance.toString()))
+      trigger()
     }
   }, [tokenIn])
+
   const onSwapSuccess = useCallback(async (tokenIn: Token, tokenOut: Token) => {
     const [newTokenIn, newTokenOut] = await Promise.all([
       getLatestTokenBalance(tokenIn),
@@ -72,14 +76,18 @@ const SwapForm = () => {
   }, [getLatestTokenBalance])
 
   const onSubmit = useCallback((values) => {
-    executeSwap({
-      tokenIn: values?.inputToken,
-      tokenOut: values?.outputToken,
-      inAmount: convertEthersToWei(values?.inputAmount),
-      gasPrice: values?.gasPrice,
-      onSwapSuccess
-    })
-  }, [executeSwap])
+    if (approveStatus !== ApproveStatus.APPROVED) {
+      onApproveToken(values?.inputToken)
+    } else {
+      executeSwap({
+        tokenIn: values?.inputToken,
+        tokenOut: values?.outputToken,
+        inAmount: convertEthersToWei(values?.inputAmount),
+        gasPrice: values?.gasPrice,
+        onSwapSuccess
+      })
+    }
+  }, [executeSwap, approveStatus, onApproveToken])
 
   useEffect(() => {
     if (tokenIn && tokenOut && inputAmount) {
@@ -92,12 +100,18 @@ const SwapForm = () => {
     }
   }, [createSwap, inputAmount, tokenIn, tokenOut, slippage])
 
+
+  useEffect(() => {
+    if (tokenIn && inputAmount) {
+      onCheckTokenApprove({ token: tokenIn, amount: convertEthersToWei(inputAmount) })
+    }
+  }, [onCheckTokenApprove, inputAmount, tokenIn])
+
   useEffect(() => {
     if (swapStatus === SwapStatus.QUOTED && swapQuote) {
       setValue(SwapFormField.outputAmount, convertWeiToEthers(swapQuote, 8))
     }
   }, [swapQuote, swapStatus])
-
 
   return (
     <Flex bg={bg} as="form" padding={6} boxShadow="base" flexDir="column" minW="350px" alignItems="center" justifyContent="center" gap="16px" onSubmit={handleSubmit(onSubmit)} borderRadius="24px">
@@ -164,10 +178,13 @@ const SwapForm = () => {
       </Flex>
       <Button
         w="100%"
+        isLoading={isOutputLoading || approveStatus === ApproveStatus.LOADING}
         isDisabled={!swapQuote || !isValid}
         colorScheme='blue'
         type="submit"
-      >Swap</Button>
+      >
+        {approveStatus !== ApproveStatus.APPROVED ? 'Approve' : 'Swap'}
+      </Button>
     </Flex>
   )
 }
