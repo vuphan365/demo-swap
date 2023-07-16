@@ -16,7 +16,7 @@ interface SimpleChartInfo {
 const SimpleChartInfo: FC<SimpleChartInfo> = ({ chartInterval, onChangeChartInterval, selectedNode, changedAmount, changedPercentage }) => {
   return (
     <Flex flexDir='column'>
-      <Box key={selectedNode?.value} display={!!selectedNode ? 'initial' : 'none'}>
+      <Box key={selectedNode?.value} display={!!selectedNode?.value ? 'initial' : 'none'}>
         <Flex gap="12px" align="baseline" >
           <Heading>
             {selectedNode?.value?.toFixed(3)}
