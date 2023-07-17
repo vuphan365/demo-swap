@@ -1,5 +1,5 @@
 "use client"
-import { Box, Flex, useColorModeValue } from '@chakra-ui/react'
+import { Flex, useColorModeValue, useColorMode } from '@chakra-ui/react'
 import SwapForm from './components/SwapForm'
 import TradingView from './components/TradingView'
 
@@ -25,5 +25,6 @@ const Swap = () => {
     </Flex>
   )
 }
+
 
 export default Swap;

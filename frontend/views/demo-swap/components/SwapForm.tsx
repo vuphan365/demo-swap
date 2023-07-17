@@ -12,7 +12,7 @@ import {
   Spinner,
   FormControl,
   FormErrorMessage,
-  useColorModeValue
+  useColorModeValue,
 } from '@chakra-ui/react'
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -21,6 +21,7 @@ import { Token } from '@/types/token'
 import { SwapFormField } from '@/types/swap'
 import TokenSelection from '@/components/TokenSelection/TokenSelection'
 import { useSwap, SwapStatus } from '@/hooks/useSwap'
+import { useSSRColor } from '@/hooks/useSSRColor'
 import { useApprove, ApproveStatus } from '@/hooks/useApprove'
 import { useToken } from '@/hooks/useToken'
 import { DEFAULT_SWAP_FORM } from '@/constant'
@@ -57,7 +58,7 @@ const SwapForm = () => {
   const isOutputLoading = useMemo(() => swapStatus === SwapStatus.QUOTING, [swapStatus])
   const bg = useColorModeValue("white", "gray.800")
   const disabledBg = useColorModeValue('gray.100', "gray.700")
-
+  const _bg = useSSRColor(bg)
   const onSetMaxInput = useCallback(() => {
     if (tokenIn) {
       setValue(SwapFormField.inputAmount, convertWeiToEthers(tokenIn.balance.toString()))
@@ -115,7 +116,7 @@ const SwapForm = () => {
 
   return (
     <Flex alignItems="flex-start">
-      <Flex bg={bg} as="form" padding={6} boxShadow="base" flexDir="column" minW={["320px", "350px"]} alignItems="center" justifyContent="center" gap="16px" onSubmit={handleSubmit(onSubmit)} borderRadius="24px">
+      <Flex bg={_bg} as="form" padding={6} boxShadow="base" flexDir="column" minW={["320px", "350px"]} alignItems="center" justifyContent="center" gap="16px" onSubmit={handleSubmit(onSubmit)} borderRadius="24px">
         <Box width="100%">
           <Heading as="h4" size="md">Swap</Heading>
           <Text fontSize="sm" mt="2">Trade tokens in an instant</Text>

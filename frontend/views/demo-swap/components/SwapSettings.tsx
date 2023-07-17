@@ -16,7 +16,7 @@ import {
   InputRightElement,
   InputGroup,
   FormControl,
-  FormErrorMessage
+  FormErrorMessage,
 } from '@chakra-ui/react'
 import { type Control, Controller } from 'react-hook-form'
 import { SettingsIcon } from '@chakra-ui/icons'
