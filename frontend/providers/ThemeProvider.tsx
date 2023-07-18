@@ -8,10 +8,11 @@ import {
   cookieStorageManagerSSR,
   localStorageManager,
 } from '@chakra-ui/react'
+import type { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 
 interface ThemeProvidersParams {
   children: React.ReactNode,
-  theme: string
+  theme: RequestCookie
 }
 
 function ThemeProviders({
@@ -19,19 +20,20 @@ function ThemeProviders({
   theme: _theme
 }: ThemeProvidersParams) {
   const colorModeManager =
-    typeof _theme === 'string'
-      ? cookieStorageManagerSSR(_theme)
+    _theme
+      ? cookieStorageManagerSSR(`${_theme?.name}=${_theme?.value}`)
       : localStorageManager
+
   const theme = useMemo(() => extendTheme({
     config: {
-      initialColorMode: _theme,
+      initialColorMode: _theme?.value,
       useSystemColorMode: false,
     }
   }), [_theme])
 
   return (
     <CacheProvider>
-      <ColorModeScript type='cookie' initialColorMode={_theme as "light"} />
+      <ColorModeScript type='cookie' initialColorMode={_theme?.value as "light" || "system"} />
       <ChakraProvider theme={theme} colorModeManager={colorModeManager}>
         {children}
       </ChakraProvider>

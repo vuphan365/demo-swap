@@ -14,7 +14,7 @@ export default function DashboardLayout({
   return (
     <html lang="en">
       <body>
-        <ThemeProviders theme={themeCookie?.value}>
+        <ThemeProviders theme={themeCookie}>
           <WagmiProvider>
             <Header />
             {children}
