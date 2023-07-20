@@ -12,11 +12,11 @@ export const formatChartData = (data) => Object.entries(data).map(([key, entry])
 })).filter(({ value }) => typeof value !== undefined)
 
 const getChartUrl = (pathname?: string, interval?: string) => {
-  return `${pathname}/api/chart/data-api/v3/cryptocurrency/detail/chart?id=1839&range=${interval}`
+  return `${pathname}api/chart/data-api/v3/cryptocurrency/detail/chart?id=1839&range=${interval}`
 }
 
 export function useFetchChart(interval?: string) {
-  const pathname = typeof window && window.location.origin
+  const pathname = typeof window && `${window.location.origin}/`
   console.log('useFetchChart', getChartUrl(pathname, interval))
   return useSWR(
     interval ? getChartUrl(pathname, interval) : null,
