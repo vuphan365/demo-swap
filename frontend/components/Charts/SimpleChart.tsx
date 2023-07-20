@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState, FC, useCallback, useTransition } from 'react'
+import React, { useEffect, useMemo, useRef, memo, useState, FC, useCallback, useTransition } from 'react'
 import { createChart, IChartApi, UTCTimestamp } from 'lightweight-charts'
 import { Box, useColorMode, Flex } from '@chakra-ui/react'
 import dayjs from 'dayjs'
@@ -13,14 +13,15 @@ import SimpleChartInfo from './SimpleChartInfo'
 
 interface SimpleChart {
   data: Array<SimpleChartNode>,
+  chartInterval: ChartTimeInterval,
+  onChangeInterval: (_value: ChartTimeInterval) => void
 }
 
 
 
-const SimpleChart: FC<SimpleChart> = ({ data }) => {
+const SimpleChart: FC<SimpleChart> = ({ data, chartInterval, onChangeInterval }) => {
   // const [lightChard, setChart] = useState<IChartApi | undefined>();
   const [isPending, startTransition] = useTransition();
-  const [chartInterval, setChartInterval] = useState<ChartTimeInterval>(ChartTimeInterval.DAY)
   const [selectedNode, setSelectedNode] = useState<SimpleChartNode>(null)
   const chartRef = useRef<HTMLDivElement>(null)
   const { colorMode } = useColorMode()
@@ -34,10 +35,6 @@ const SimpleChart: FC<SimpleChart> = ({ data }) => {
     , [data]);
 
   const colors = useMemo(() => getChartColors(isPositiveChart), [isPositiveChart]);
-
-  const onChangeChartInterval = useCallback((_value: ChartTimeInterval) => {
-    setChartInterval(_value)
-  }, [])
 
   const lastNode = useMemo(() => transformedData[transformedData.length - 1], [transformedData])
 
@@ -159,7 +156,7 @@ const SimpleChart: FC<SimpleChart> = ({ data }) => {
     <Flex height="100%" flexDir='column'>
       <SimpleChartInfo
         chartInterval={chartInterval}
-        onChangeChartInterval={onChangeChartInterval}
+        onChangeChartInterval={onChangeInterval}
         selectedNode={selectedNode || lastNode}
         changedAmount={changedAmount}
         changedPercentage={changedPercentage}
@@ -169,4 +166,4 @@ const SimpleChart: FC<SimpleChart> = ({ data }) => {
   )
 }
 
-export default SimpleChart
+export default memo(SimpleChart)

@@ -29,10 +29,10 @@ export const getChartColors = (isPositiveChart) => {
 };
 
 export enum ChartTimeInterval {
-  DAY,
-  WEEK,
-  MONTH,
-  YEAR,
+  DAY = '1D',
+  WEEK = '7D',
+  MONTH = '1M',
+  YEAR = '1Y',
 }
 
 export const ChartIntervalOptions = [{
