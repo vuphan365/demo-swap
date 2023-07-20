@@ -1,9 +1,10 @@
 import React from 'react'
 import { fetchChart24h, formatChartData } from '@/apis/chart'
+import { headers } from 'next/headers';
 import TradingViewClient from './TradingViewClient'
-
 async function TradingView() {
-  const res = await fetchChart24h()
+  const headersList = headers();
+  const res = await fetchChart24h(headersList.get('referer'))
 
   return (
     <TradingViewClient data={formatChartData(res?.data?.points || {})}>
