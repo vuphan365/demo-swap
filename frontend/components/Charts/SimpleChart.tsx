@@ -31,7 +31,7 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
 
   const transformedData: Array<SimpleChartNode> = useMemo(() => data?.map(({ time, value }) =>
     //@ts-ignore
-    ({ time: Math.floor((new Date(time)).getTime() / 1000) as UTCTimestamp, value })) || []
+    ({ time: Math.floor(time / 1000) as UTCTimestamp, value })) || []
     , [data]);
 
   console.log('transformedData', transformedData)
