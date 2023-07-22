@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, memo, useState, FC, useCallback, useTransition } from 'react'
-import { createChart, IChartApi, UTCTimestamp } from 'lightweight-charts'
+import { createChart, UTCTimestamp } from 'lightweight-charts'
 import { Box, useColorMode, Flex } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import {
@@ -10,6 +10,7 @@ import {
   SimpleChartNode
 } from './utils'
 import SimpleChartInfo from './SimpleChartInfo'
+import SimpleChartPriceDetail from './SimpleChartPriceDetail'
 
 interface SimpleChart {
   data: Array<SimpleChartNode>,
@@ -20,7 +21,6 @@ interface SimpleChart {
 
 
 const SimpleChart: FC<SimpleChart> = ({ data, chartInterval, onChangeInterval }) => {
-  // const [lightChard, setChart] = useState<IChartApi | undefined>();
   const [isPending, startTransition] = useTransition();
   const [selectedNode, setSelectedNode] = useState<SimpleChartNode>(null)
   const chartRef = useRef<HTMLDivElement>(null)
@@ -113,7 +113,6 @@ const SimpleChart: FC<SimpleChart> = ({ data, chartInterval, onChangeInterval })
         minMove: 0.0001,
       },
     });
-    // setChart(chart);
     newSeries.setData(transformedData);
     chart.timeScale().fitContent();
     chart.subscribeCrosshairMove((param) => {
@@ -136,12 +135,8 @@ const SimpleChart: FC<SimpleChart> = ({ data, chartInterval, onChangeInterval })
           time: timestamp as UTCTimestamp,
           value: parsedValue
         })
-        // if (setHoverValue) setHoverValue(parsed);
-        // if (setHoverDate) setHoverDate(time);
       } else {
         onMouseLeave()
-        // if (setHoverValue) setHoverValue(undefined);
-        // if (setHoverDate) setHoverDate(undefined);
       }
     });
 
@@ -157,10 +152,13 @@ const SimpleChart: FC<SimpleChart> = ({ data, chartInterval, onChangeInterval })
       <SimpleChartInfo
         chartInterval={chartInterval}
         onChangeChartInterval={onChangeInterval}
-        selectedNode={selectedNode || lastNode}
-        changedAmount={changedAmount}
-        changedPercentage={changedPercentage}
-      />
+      >
+        <SimpleChartPriceDetail
+          selectedNode={selectedNode || lastNode}
+          changedAmount={changedAmount}
+          changedPercentage={changedPercentage}
+        />
+      </SimpleChartInfo>
       <Box flex={1} ref={chartRef} id="simple-chart" onMouseLeave={onMouseLeave} />
     </Flex >
   )
