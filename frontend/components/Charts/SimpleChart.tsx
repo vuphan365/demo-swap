@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, memo, useState, FC, useCallback, useTransition } from 'react'
+'use client'
+import React, { useEffect, useMemo, useRef, memo, useState, FC, useCallback, useTransition, Suspense } from 'react'
 import { createChart, UTCTimestamp } from 'lightweight-charts'
 import { Box, useColorMode, Flex, Spinner } from '@chakra-ui/react'
 import dayjs from 'dayjs'
@@ -9,9 +10,11 @@ import {
   DateFormByInterval,
   SimpleChartNode
 } from './utils'
+import utc from 'dayjs/plugin/utc'
 import SimpleChartInfo from './SimpleChartInfo'
 import SimpleChartPriceDetail from './SimpleChartPriceDetail'
 
+dayjs.extend(utc)
 interface SimpleChart {
   data: Array<SimpleChartNode>,
   isLoading: boolean,
@@ -30,7 +33,7 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
 
   const transformedData: Array<SimpleChartNode> = useMemo(() => data?.map(({ time, value }) =>
     //@ts-ignore
-    ({ time: Math.floor((new Date(time)).getTime() / 1000) as UTCTimestamp, value })) || []
+    ({ time: Math.floor(time / 1000) as UTCTimestamp, value })) || []
     , [data]);
 
   const colors = useMemo(() => getChartColors(isPositiveChart), [isPositiveChart]);
@@ -71,7 +74,7 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
         borderVisible: false,
         secondsVisible: false,
         tickMarkFormatter: (unixTime: number) => {
-          return dayjs(unixTime * 1000).format(DateFormByInterval[chartInterval]).toUpperCase();
+          return dayjs(unixTime * 1000).utc().format(DateFormByInterval[chartInterval]).toUpperCase();
         },
       },
       grid: {
@@ -130,7 +133,6 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
     });
 
     const handleResize = () => {
-      console.log('handleResize')
       chart.applyOptions({ width: chartRef.current.clientWidth, height: chartRef.current.clientHeight });
     };
 
@@ -155,6 +157,13 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
           changedAmount={changedAmount}
           changedPercentage={changedPercentage}
         />
+        {/* <Suspense fallback={<Box height={60} w={100} />}>
+          <SimpleChartPriceDetail
+            selectedNode={selectedNode || lastNode}
+            changedAmount={changedAmount}
+            changedPercentage={changedPercentage}
+          />
+        </Suspense> */}
       </SimpleChartInfo>
       <Box opacity={isLoading ? 0.8 : 1} flex={1} ref={chartRef} id="simple-chart" onMouseLeave={onMouseLeave} >
       </Box>

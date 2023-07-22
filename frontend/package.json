@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "next dev -p 3001",
         "build": "next build",
-        "start": "next start"
+        "start": "next start -p 3001"
     },
     "dependencies": {
         "@chakra-ui/icon": "^3.0.16",

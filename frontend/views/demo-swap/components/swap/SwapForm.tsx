@@ -114,7 +114,7 @@ const SwapForm = () => {
 
   return (
     <Flex alignItems="flex-start">
-      <Flex bg={bg} as="form" padding={6} boxShadow="base" flexDir="column" minW={["320px", "350px"]} alignItems="center" justifyContent="center" gap="16px" onSubmit={handleSubmit(onSubmit)} borderRadius="24px">
+      <Flex bg={bg} as="form" padding={6} boxShadow="base" flexDir="column" minW={["358px", "400px"]} alignItems="center" justifyContent="center" gap="16px" onSubmit={handleSubmit(onSubmit)} borderRadius="24px">
         <Box width="100%">
           <Heading as="h4" size="md">Swap</Heading>
           <Text fontSize="sm" mt="2">Trade tokens in an instant</Text>

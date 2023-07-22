@@ -11,15 +11,15 @@ const DemoSwapClient = ({ children }) => {
     <Flex
       minHeight="calc(100vh - 56px)"
       width="100%"
-      gap="36px"
+      gap={["16px", "36px"]}
       alignItems="stretch"
       justifyContent="space-between"
-      p="36px"
+      p={["16px", "36px"]}
       bgGradient={bgGradient}
       flexDir={["column-reverse", "row"]}
     >
       {children}
-    </Flex>
+    </Flex >
   )
 }
 

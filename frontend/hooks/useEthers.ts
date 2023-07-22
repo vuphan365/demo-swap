@@ -29,7 +29,7 @@ export function useEthersProvider() {
 }
 
 export function useWeb3Provider() {
-  if (typeof window === 'undefined') return null
+  if (typeof window === 'undefined' || typeof window?.ethereum === 'undefined') return null
   // @ts-ignore
   return React.useMemo(() => new providers.Web3Provider(window?.ethereum), [])
 }
