@@ -77,7 +77,6 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
         borderVisible: false,
         secondsVisible: false,
         tickMarkFormatter: (unixTime: number) => {
-          return unixTime
           return dayjs(unixTime * 1000).utc().format(DateFormByInterval[chartInterval]).toUpperCase();
         },
       },
