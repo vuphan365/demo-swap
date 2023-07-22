@@ -9,7 +9,6 @@ interface SimpleChartInfo {
   onChangeChartInterval: (_value: ChartTimeInterval) => void,
 }
 
-
 const SimpleChartInfo: FC<PropsWithChildren<SimpleChartInfo>> = ({ chartInterval, onChangeChartInterval, children }) => {
   return (
     <Flex flexDir='column'>

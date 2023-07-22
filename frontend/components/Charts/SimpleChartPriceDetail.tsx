@@ -1,9 +1,12 @@
 'use client'
-import React, { FC, useDeferredValue, useEffect } from 'react'
+import React, { FC, useCallback } from 'react'
 import { Box, Flex, Heading, Text } from '@chakra-ui/react'
 import dayjs from 'dayjs'
+import dynamic from 'next/dynamic'
 import utc from 'dayjs/plugin/utc'
 import { SimpleChartNode } from './utils'
+
+const DynamicHydration = dynamic(() => import('@/components/DynamicHydration'), { ssr: false })
 
 dayjs.extend(utc)
 
@@ -14,6 +17,9 @@ interface SimpleChartPriceDetailProps {
 }
 
 const SimpleChartPriceDetail: FC<SimpleChartPriceDetailProps> = ({ selectedNode, changedAmount, changedPercentage }) => {
+  const dateRenderer = useCallback((_date) => {
+    return <Text ml="5px">{dayjs(selectedNode?.time * 1000).utc().format("MMM DD YYYY, hh:MM A")}</Text>
+  }, [])
   return (
     <Box key={selectedNode?.value} display={!!selectedNode?.value ? 'initial' : 'none'}>
       <Flex gap="12px" align="baseline" >
@@ -24,8 +30,7 @@ const SimpleChartPriceDetail: FC<SimpleChartPriceDetailProps> = ({ selectedNode,
           {changedAmount > 0 && '+'}{changedAmount.toFixed(2)}({changedPercentage}%)
         </Heading>
       </Flex>
-      <Text ml="5px">{selectedNode?.time}</Text>
-      {/* <Text ml="5px">{dayjs(selectedNode?.time * 1000).utc().format("MMM DD YYYY, hh:MM A")}</Text> */}
+      <DynamicHydration data={selectedNode} renderer={dateRenderer} />
     </Box>
   )
 }

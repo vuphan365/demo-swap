@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useMemo, useRef, memo, useState, FC, useCallback, useTransition } from 'react'
+import React, { useEffect, useMemo, useRef, memo, useState, FC, useCallback, useTransition, Suspense } from 'react'
 import { createChart, UTCTimestamp } from 'lightweight-charts'
 import { Box, useColorMode, Flex, Spinner } from '@chakra-ui/react'
 import dayjs from 'dayjs'
@@ -36,12 +36,10 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
     ({ time: Math.floor(time / 1000) as UTCTimestamp, value })) || []
     , [data]);
 
+  console.log('transformedData', transformedData)
   const colors = useMemo(() => getChartColors(isPositiveChart), [isPositiveChart]);
 
-  useEffect(() => {
-    // Solve hydration issue about Date mismatch
-    setSelectedNode(transformedData[transformedData.length - 1])
-  }, [transformedData])
+  const lastNode = useMemo(() => transformedData[transformedData.length - 1], [transformedData])
 
   const onMouseLeave = useCallback(() => {
     startTransition(() => {
@@ -77,7 +75,8 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
         borderVisible: false,
         secondsVisible: false,
         tickMarkFormatter: (unixTime: number) => {
-          return dayjs(unixTime * 1000).utc().format(DateFormByInterval[chartInterval]).toUpperCase();
+          return unixTime
+          // return dayjs(unixTime * 1000).utc().format(DateFormByInterval[chartInterval]).toUpperCase();
         },
       },
       grid: {
@@ -157,10 +156,17 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
         onChangeChartInterval={onChangeInterval}
       >
         <SimpleChartPriceDetail
-          selectedNode={selectedNode}
+          selectedNode={selectedNode || lastNode}
           changedAmount={changedAmount}
           changedPercentage={changedPercentage}
         />
+        {/* <Suspense fallback={<Box height={60} w={100} />}>
+          <SimpleChartPriceDetail
+            selectedNode={selectedNode || lastNode}
+            changedAmount={changedAmount}
+            changedPercentage={changedPercentage}
+          />
+        </Suspense> */}
       </SimpleChartInfo>
       <Box opacity={isLoading ? 0.8 : 1} flex={1} ref={chartRef} id="simple-chart" onMouseLeave={onMouseLeave} >
       </Box>
