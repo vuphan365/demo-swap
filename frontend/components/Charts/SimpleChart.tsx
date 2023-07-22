@@ -10,9 +10,11 @@ import {
   DateFormByInterval,
   SimpleChartNode
 } from './utils'
+import utc from 'dayjs/plugin/utc'
 import SimpleChartInfo from './SimpleChartInfo'
 import SimpleChartPriceDetail from './SimpleChartPriceDetail'
 
+dayjs.extend(utc)
 interface SimpleChart {
   data: Array<SimpleChartNode>,
   isLoading: boolean,
@@ -74,7 +76,7 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
         secondsVisible: false,
         tickMarkFormatter: (unixTime: number) => {
           return unixTime
-          // return dayjs(unixTime * 1000).format(DateFormByInterval[chartInterval]).toUpperCase();
+          return dayjs(unixTime * 1000).utc().format(DateFormByInterval[chartInterval]).toUpperCase();
         },
       },
       grid: {
