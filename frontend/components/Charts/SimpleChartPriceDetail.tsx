@@ -1,5 +1,5 @@
 'use client'
-import React, { FC, useDeferredValue } from 'react'
+import React, { FC, useDeferredValue, useEffect } from 'react'
 import { Box, Flex, Heading, Text } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -14,8 +14,8 @@ interface SimpleChartPriceDetailProps {
 }
 
 const SimpleChartPriceDetail: FC<SimpleChartPriceDetailProps> = ({ selectedNode, changedAmount, changedPercentage }) => {
-  const date = useDeferredValue(dayjs(selectedNode?.time * 1000).utc().format("MMM DD YYYY, hh:MM A"))
-  console.log('date', date)
+  const date = useDeferredValue(selectedNode && dayjs(selectedNode?.time * 1000).utc().format("MMM DD YYYY, hh:MM A"))
+
   return (
     <Box key={selectedNode?.value} display={!!selectedNode?.value ? 'initial' : 'none'}>
       <Flex gap="12px" align="baseline" >

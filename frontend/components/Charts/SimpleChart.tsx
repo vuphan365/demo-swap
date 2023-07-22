@@ -36,10 +36,12 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
     ({ time: Math.floor(time / 1000) as UTCTimestamp, value })) || []
     , [data]);
 
-  console.log('transformedData', transformedData)
   const colors = useMemo(() => getChartColors(isPositiveChart), [isPositiveChart]);
 
-  const lastNode = useMemo(() => transformedData[transformedData.length - 1], [transformedData])
+  useEffect(() => {
+    // Solve hydration issue about Date mismatch
+    setSelectedNode(transformedData[transformedData.length - 1])
+  }, [transformedData])
 
   const onMouseLeave = useCallback(() => {
     startTransition(() => {
@@ -156,7 +158,7 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
         onChangeChartInterval={onChangeInterval}
       >
         <SimpleChartPriceDetail
-          selectedNode={selectedNode || lastNode}
+          selectedNode={selectedNode}
           changedAmount={changedAmount}
           changedPercentage={changedPercentage}
         />
