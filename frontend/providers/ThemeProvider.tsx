@@ -1,26 +1,40 @@
 'use client'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { CacheProvider } from '@chakra-ui/next-js'
-import { ChakraProvider, ColorModeScript, extendTheme } from '@chakra-ui/react'
+import {
+  ChakraProvider,
+  ColorModeScript,
+  extendTheme,
+  cookieStorageManagerSSR,
+  localStorageManager,
+} from '@chakra-ui/react'
+import type { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 
 interface ThemeProvidersParams {
-  children: React.ReactNode
+  children: React.ReactNode,
+  theme: RequestCookie
 }
-
-const config = {
-  initialColorMode: 'dark',
-  useSystemColorMode: true,
-}
-
-const theme = extendTheme({ config })
 
 function ThemeProviders({
-  children
+  children,
+  theme: _theme
 }: ThemeProvidersParams) {
+  const colorModeManager =
+    _theme
+      ? cookieStorageManagerSSR(`${_theme?.name}=${_theme?.value}`)
+      : localStorageManager
+
+  const theme = useMemo(() => extendTheme({
+    config: {
+      initialColorMode: _theme?.value,
+      useSystemColorMode: false,
+    }
+  }), [_theme])
+
   return (
     <CacheProvider>
-      <ChakraProvider theme={theme}>
-        <ColorModeScript initialColorMode='dark' />
+      <ColorModeScript type='cookie' initialColorMode={_theme?.value as "light" || "system"} />
+      <ChakraProvider theme={theme} colorModeManager={colorModeManager}>
         {children}
       </ChakraProvider>
     </CacheProvider>

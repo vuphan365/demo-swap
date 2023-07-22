@@ -4,11 +4,13 @@ import { LinkIcon } from '@chakra-ui/icons'
 import { useConnect } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { useEffect } from 'react'
+import { goerli } from 'wagmi/chains'
 import { isDev } from '@/constant'
 
 const ConnectWallet = () => {
   const { connect } = useConnect({
     connector: new InjectedConnector(),
+    chainId: goerli.id
   })
 
   useEffect(() => {

@@ -58,3 +58,5 @@ export const ERC20_ABI = [
 ]
 
 export const isDev = process.env.NEXT_PUBLIC_ENV === 'dev'
+
+export const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || ""
