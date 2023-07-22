@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useMemo, useRef, memo, useState, FC, useCallback, useTransition } from 'react'
 import { createChart, UTCTimestamp } from 'lightweight-charts'
 import { Box, useColorMode, Flex, Spinner } from '@chakra-ui/react'
@@ -33,6 +34,7 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
     ({ time: Math.floor((new Date(time)).getTime() / 1000) as UTCTimestamp, value })) || []
     , [data]);
 
+  console.log('transformedData', transformedData)
   const colors = useMemo(() => getChartColors(isPositiveChart), [isPositiveChart]);
 
   const lastNode = useMemo(() => transformedData[transformedData.length - 1], [transformedData])
