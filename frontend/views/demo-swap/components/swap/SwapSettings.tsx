@@ -84,9 +84,9 @@ const SwapSetting: FC<SwapSettingParams> = ({ control }) => {
                 control={control}
                 name={SwapFormField.gasPrice}
                 render={({ field: { onChange, value } }) => (
-                  <ButtonGroup mt={4} borderRadius="16px" borderWidth="2px" p="1px">
+                  <ButtonGroup mt={4} borderRadius="16px" borderWidth="2px" p="1px" flexWrap={["wrap", "nowrap"]}>
                     {GasPriceOptions.map(({ name, value: _value }) => (
-                      <Button {...buttonProps} key={`gas-price-${_value}`} variant={value === _value ? 'solid' : buttonProps.variant} onClick={() => onChange(_value)}>{name} ({_value})</Button>
+                      <Button minWidth={["50%", "auto"]} {...buttonProps} key={`gas-price-${_value}`} variant={value === _value ? 'solid' : buttonProps.variant} onClick={() => onChange(_value)}>{name} ({_value})</Button>
                     ))}
                   </ButtonGroup>
                 )}
@@ -106,7 +106,7 @@ const SwapSetting: FC<SwapSettingParams> = ({ control }) => {
                       ))}
                       {/* <Button {...buttonProps}>Custom</Button> */}
                       <InputGroup width="120px" {...buttonProps} fontWeight={800}>
-                        <Input {...buttonProps} placeholder='Custom' type="number" onChange={e => onChange(Number(e.target.value) / 100)} />
+                        <Input {...buttonProps} placeholder='Custom' defaultValue={value * 100} type="number" onChange={e => onChange(Number(e.target.value) / 100)} />
                         <InputRightElement>
                           %
                         </InputRightElement>

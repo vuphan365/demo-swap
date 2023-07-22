@@ -36,7 +36,6 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
     ({ time: Math.floor(time / 1000) as UTCTimestamp, value })) || []
     , [data]);
 
-  console.log('transformedData', transformedData)
   const colors = useMemo(() => getChartColors(isPositiveChart), [isPositiveChart]);
 
   const lastNode = useMemo(() => transformedData[transformedData.length - 1], [transformedData])
@@ -75,8 +74,7 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
         borderVisible: false,
         secondsVisible: false,
         tickMarkFormatter: (unixTime: number) => {
-          return unixTime
-          // return dayjs(unixTime * 1000).utc().format(DateFormByInterval[chartInterval]).toUpperCase();
+          return dayjs(unixTime * 1000).utc().format(DateFormByInterval[chartInterval]).toUpperCase();
         },
       },
       grid: {
@@ -135,7 +133,6 @@ const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChange
     });
 
     const handleResize = () => {
-      console.log('handleResize')
       chart.applyOptions({ width: chartRef.current.clientWidth, height: chartRef.current.clientHeight });
     };
 

@@ -14,12 +14,12 @@ const SimpleChartInfo: FC<PropsWithChildren<SimpleChartInfo>> = ({ chartInterval
     <Flex flexDir='column'>
       <Flex gap="4px" key="simple-chart-info-icon">
         <Image src={BNBIcon} width={20} height={20} alt="Icon" />
-        <Heading size="md" color='gray.500' as='div'>
+        <Heading size={["sm", "md"]} color='gray.500' as='div'>
           BNB/USD
         </Heading>
       </Flex>
       {children}
-      <ButtonGroup key="simple-chart-info-interval" w="fit-content" mt={2} borderRadius="16px" borderWidth="2px" p="1px">
+      <ButtonGroup key="simple-chart-info-interval" mt={2} borderRadius="16px" borderWidth="2px" p="1px" width={['100%', "fit-content"]}>
         {ChartIntervalOptions.map(({ label, value: _value }) => (
           <Button
             height="32px"
@@ -29,7 +29,7 @@ const SimpleChartInfo: FC<PropsWithChildren<SimpleChartInfo>> = ({ chartInterval
             onClick={() => onChangeChartInterval(_value)}
             colorScheme="linkedin"
             borderRadius="16px"
-            minW="60px"
+            minW={["25%", "60px"]}
             marginInlineStart="0px !important"
             borderWidth={0}
           >{label}</Button>

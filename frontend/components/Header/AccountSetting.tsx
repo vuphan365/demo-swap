@@ -13,7 +13,7 @@ const AccountSetting = () => {
 
   return (
     <Button rightIcon={<ExternalLinkIcon />} colorScheme='blue' onClick={() => disconnect()} borderRadius="16px" px={6}>
-      <Heading as="h5" size="sm">
+      <Heading as="div" size="sm">
         {shortenAddress}
       </Heading>
     </Button>
