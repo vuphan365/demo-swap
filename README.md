@@ -15,7 +15,7 @@ npm run dev
 Open [http://localhost:3000/](http://localhost:3000/) to see your Dapp. You will [Metamask](https://metamask.io) installed
 
 ## User Guide
-![image](https://github.com/vuphan365/demo-swap/assets/29919845/8c8b9ed2-0f7d-4fd8-ac78-5707d93da642)
+![image](https://github.com/vuphan365/demo-swap/assets/29919845/49da991e-c0ec-4a74-996a-376bc36c472b)
 
 
 - Step 1: Connect your wallet
