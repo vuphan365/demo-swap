@@ -21,6 +21,7 @@ const SimpleChartPriceDetail: FC<SimpleChartPriceDetailProps> = ({ selectedNode,
           {changedAmount > 0 && '+'}{changedAmount.toFixed(2)}({changedPercentage}%)
         </Heading>
       </Flex>
+      <Text ml="5px">{selectedNode?.time}</Text>
       <Text ml="5px">{dayjs(selectedNode?.time * 1000).format("MMM DD YYYY, hh:MM A")}</Text>
     </Box>
   )
