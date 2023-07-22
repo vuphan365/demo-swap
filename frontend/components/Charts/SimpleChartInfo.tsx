@@ -14,7 +14,7 @@ const SimpleChartInfo: FC<PropsWithChildren<SimpleChartInfo>> = ({ chartInterval
   return (
     <Flex flexDir='column'>
       <Flex gap="4px" key="simple-chart-info-icon">
-        <Image src={BNBIcon} width={24} height={24} alt="Icon" />
+        <Image src={BNBIcon} width={20} height={20} alt="Icon" />
         <Heading size="md" color='gray.500'>
           BNB/USD
         </Heading>

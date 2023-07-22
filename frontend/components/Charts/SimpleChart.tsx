@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, memo, useState, FC, useCallback, useTransition } from 'react'
 import { createChart, UTCTimestamp } from 'lightweight-charts'
-import { Box, useColorMode, Flex } from '@chakra-ui/react'
+import { Box, useColorMode, Flex, Spinner } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import {
   getChartColors,
@@ -14,13 +14,12 @@ import SimpleChartPriceDetail from './SimpleChartPriceDetail'
 
 interface SimpleChart {
   data: Array<SimpleChartNode>,
+  isLoading: boolean,
   chartInterval: ChartTimeInterval,
   onChangeInterval: (_value: ChartTimeInterval) => void
 }
 
-
-
-const SimpleChart: FC<SimpleChart> = ({ data, chartInterval, onChangeInterval }) => {
+const SimpleChart: FC<SimpleChart> = ({ data, isLoading, chartInterval, onChangeInterval }) => {
   const [isPending, startTransition] = useTransition();
   const [selectedNode, setSelectedNode] = useState<SimpleChartNode>(null)
   const chartRef = useRef<HTMLDivElement>(null)
@@ -109,8 +108,8 @@ const SimpleChart: FC<SimpleChart> = ({ data, chartInterval, onChangeInterval })
     newSeries.applyOptions({
       priceFormat: {
         type: "price",
-        precision: 4,
-        minMove: 0.0001,
+        precision: 3,
+        minMove: 1,
       },
     });
     newSeries.setData(transformedData);
@@ -119,16 +118,6 @@ const SimpleChart: FC<SimpleChart> = ({ data, chartInterval, onChangeInterval })
       if (newSeries && param) {
         const timestamp = param.time as number;
         if (!timestamp) return;
-        // const time = new Date(timestamp * 1000);
-
-        // const time = `${now.toLocaleString(locale, {
-        //   year: "numeric",
-        //   month: "short",
-        //   day: "numeric",
-        //   hour: "numeric",
-        //   minute: "2-digit",
-        //   timeZone: "UTC",
-        // })} (UTC)`;
         // @ts-ignore
         const parsedValue = (param.seriesData.get(newSeries)?.value ?? 0) as number | undefined;
         onChangeSelectedNode({
@@ -140,8 +129,16 @@ const SimpleChart: FC<SimpleChart> = ({ data, chartInterval, onChangeInterval })
       }
     });
 
+    const handleResize = () => {
+      console.log('handleResize')
+      chart.applyOptions({ width: chartRef.current.clientWidth, height: chartRef.current.clientHeight });
+    };
+
+    window.addEventListener('resize', handleResize);
+
     // eslint-disable-next-line consistent-return
     return () => {
+      window.removeEventListener('resize', handleResize);
       chart.remove();
     };
 
@@ -159,7 +156,8 @@ const SimpleChart: FC<SimpleChart> = ({ data, chartInterval, onChangeInterval })
           changedPercentage={changedPercentage}
         />
       </SimpleChartInfo>
-      <Box flex={1} ref={chartRef} id="simple-chart" onMouseLeave={onMouseLeave} />
+      <Box opacity={isLoading ? 0.8 : 1} flex={1} ref={chartRef} id="simple-chart" onMouseLeave={onMouseLeave} >
+      </Box>
     </Flex >
   )
 }

@@ -1,13 +1,13 @@
 import React from 'react'
-import { fetchChart24h, formatChartData } from '@/apis/chart'
+import { fetchChart } from '@/apis/chart'
+import { formatChartData } from '@/apis/chart/utils'
 import TradingViewClient from './TradingViewClient'
 
 async function TradingView() {
-  const res = await fetchChart24h()
+  const res = await fetchChart('1D')
 
   return (
-    <TradingViewClient data={formatChartData(res?.data?.points || {})}>
-    </TradingViewClient>
+    <TradingViewClient serverData={formatChartData(res?.data?.points || {})} />
   )
 }
 
