@@ -14,7 +14,7 @@ export const formatChartData = (data) => Object.entries(data).map(([key, entry])
 
 const getChartUrl = (interval?: string) => {
   console.log('SERVER_URL', SERVER_URL)
-  return `${SERVER_URL}/api/chart/data-api/v3/cryptocurrency/detail/chart?id=1839&range=${interval}`
+  return `${SERVER_URL}api/chart/data-api/v3/cryptocurrency/detail/chart?id=1839&range=${interval}`
 }
 
 export function useFetchChart(interval?: string) {
