@@ -72,7 +72,7 @@ const SwapSetting: FC<SwapSettingParams> = ({ control }) => {
         leftIcon={<SettingsIcon boxSize="18px" marginRight={0} />}
         onClick={setSettingVisible.on}
       />
-      <Modal isCentered isOpen={settingVisible} onClose={setSettingVisible.off}>
+      <Modal isCentered isOpen={settingVisible} onClose={setSettingVisible.off} size="lg">
         <ModalOverlay />
         <ModalContent borderRadius="16px" bg={bg} >
           <ModalHeader>Swap Settings</ModalHeader>
@@ -86,7 +86,7 @@ const SwapSetting: FC<SwapSettingParams> = ({ control }) => {
                 render={({ field: { onChange, value } }) => (
                   <ButtonGroup mt={4} borderRadius="16px" borderWidth="2px" p="1px" flexWrap={["wrap", "nowrap"]}>
                     {GasPriceOptions.map(({ name, value: _value }) => (
-                      <Button minWidth={["50%", "auto"]} {...buttonProps} key={`gas-price-${_value}`} variant={value === _value ? 'solid' : buttonProps.variant} onClick={() => onChange(_value)}>{name} ({_value})</Button>
+                      <Button minWidth={["50%", "25%"]} {...buttonProps} key={`gas-price-${_value}`} variant={value === _value ? 'solid' : buttonProps.variant} onClick={() => onChange(_value)}>{name} ({_value})</Button>
                     ))}
                   </ButtonGroup>
                 )}
