@@ -6,27 +6,25 @@ import { createPublicClient, http } from 'viem'
 import { wagmiAtom } from '@/utils/ethers'
 
 interface WagmiProvidersParams {
-  children: React.ReactNode
+    children: React.ReactNode
 }
 
-function ThemeProviders({
-  children
-}: WagmiProvidersParams) {
-  const { chainId } = useAtomValue(wagmiAtom)
+function ThemeProviders({ children }: WagmiProvidersParams) {
+    const { chainId } = useAtomValue(wagmiAtom)
 
-  const config = useMemo(() => createConfig({
-    autoConnect: true,
-    publicClient: createPublicClient({
-      chain: chainId,
-      transport: http()
-    }),
-  }), [chainId])
+    const config = useMemo(
+        () =>
+            createConfig({
+                autoConnect: true,
+                publicClient: createPublicClient({
+                    chain: chainId,
+                    transport: http(),
+                }),
+            }),
+        [chainId]
+    )
 
-  return (
-    <WagmiConfig config={config}>
-      {children}
-    </WagmiConfig>
-  )
+    return <WagmiConfig config={config}>{children}</WagmiConfig>
 }
 
 export default ThemeProviders

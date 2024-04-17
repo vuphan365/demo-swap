@@ -1,13 +1,13 @@
 import { atom, useAtomValue } from 'jotai'
 import { Chain } from 'wagmi'
-import { goerli } from 'wagmi/chains'
+import { bsc } from 'wagmi/chains'
 
 interface WagmiAtom {
-  chainId?: Chain
+    chainId?: Chain
 }
 
 export const wagmiAtom = atom<WagmiAtom>({
-  chainId: goerli
+    chainId: bsc,
 })
 
 export const useWagmiAtom = () => useAtomValue(wagmiAtom)
